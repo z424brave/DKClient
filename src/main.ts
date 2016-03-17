@@ -6,14 +6,14 @@ import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import {appInjector} from './app/common/app-injector';
 import {AuthService} from './app/auth/auth-service';
 
-
 import {App} from './app/app';
 import {HttpClient} from './app/common/http-client';
 import {NotificationService} from './app/common/service/notification-service';
 
 
 document.addEventListener('DOMContentLoaded', function main() {
-    bootstrap(App, [
+	console.log(`Running app in ${process.env.NODE_ENV} pointing at ${process.env.API}`);
+	bootstrap(App, [
         AuthService,
         HttpClient,
         NotificationService,

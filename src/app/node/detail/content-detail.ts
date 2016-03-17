@@ -69,6 +69,7 @@ export class ContentDetail implements OnInit {
         let id = this._routeParams.get('id');
 
         var that = this;
+		console.log(`Calling getTypes - ${id}`);
         this._tagService.getTypes()
             .subscribe(
                 types => {

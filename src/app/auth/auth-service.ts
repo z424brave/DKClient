@@ -49,10 +49,10 @@ export class AuthService {
                 .subscribe(
                     response => {
                         var idToken = response.json().token;
-                        console.log(idToken);
                         localStorage.setItem('id_token', idToken);
                         let token = this.jwtHelper.decodeToken(idToken);
-                        console.log(token);						
+                        console.log(`Token is ${idToken}`); 
+                        console.log(`Token is ${JSON.stringify(token)}`);					
                         //TODO get the user from the response object;
                         this.currentUser = new User();
                         this.currentUser._id = token._id;

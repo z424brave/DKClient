@@ -42,6 +42,7 @@ export class TagService {
     }
 
     getTags(lexiconId) {
+	    console.log(`in getTags - ${lexiconId}`);
         var that = this;
         return Observable.create(observer => {
             this._httpClient.get(this.baseUrl.concat(lexiconId).concat('/tags/'))
@@ -62,6 +63,27 @@ export class TagService {
         });
     };
 
+    getAllTags() {
+	    console.log(`in getAllTags`);
+        var that = this;
+        return Observable.create(observer => {
+            this._httpClient.get(API_ENDPOINT.concat('/tags/'))
+                .map((responseData) => {
+                    return responseData.json();
+                })
+                .subscribe(
+                    data => observer.next(data),
+                    err => {
+                        that._notificationService.handleError(
+                            new ApplicationError(
+                                'Error loading tags',
+                                err));
+                    }
+                    ,
+                    () => observer.complete()
+                );
+        });
+    };	
     updateTag(lexiconId: string, tag: Tag) {
         var that = this;
         console.log('update : ' + tag);

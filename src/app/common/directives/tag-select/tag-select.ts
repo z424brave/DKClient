@@ -54,7 +54,8 @@ export class TagSelect implements OnInit {
 
 
     onNodeChange(node: ContentNode) {
-        this._tagService.getTags(node.type._id).subscribe(
+	    console.log(`in onNodeChange - ${node.name}`);
+        this._tagService.getAllTags().subscribe(
             tags => this.tags = tags
         );
         this.selectedTags = node.tags;

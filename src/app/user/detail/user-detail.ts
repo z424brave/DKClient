@@ -33,6 +33,9 @@ export class UserDetail implements OnInit {
     statuses = ['active', 'deleted'];
     userForm: ControlGroup;
     name: AbstractControl;
+	email: AbstractControl;
+	role: AbstractControl;
+	status: AbstractControl;	
     submitted: boolean = false;
 
     constructor(private _formBuilder: FormBuilder,
@@ -44,6 +47,7 @@ export class UserDetail implements OnInit {
     submitUser(value) {
         var that =  this;
         this.submitted = true;
+		console.log(`in submitUser - ${this.userForm.valid}`);
         if (this.userForm.valid) {
             this._userService.saveUser(this.user).subscribe(
                 data => {
@@ -51,7 +55,14 @@ export class UserDetail implements OnInit {
                     //that._router.navigate(['User'])
                 }
             );
-        }
+        } else {
+		
+			console.log(`Name is ${this.name.value} ${this.name.valid}`);
+			console.log(`Email is ${this.email.value} ${this.email.valid}`);
+			console.log(`Role is ${this.role.value} ${this.role.valid}`);
+			console.log(`Status is ${this.status.value} ${this.status.valid}`);
+			
+		}
     }
 
 
@@ -67,7 +78,7 @@ export class UserDetail implements OnInit {
     }
 
     initForm() {
-        //console.log('initiating form: ' + JSON.stringify(this.user));
+        console.log('initiating form: ' + JSON.stringify(this.user));
         this.userForm = this._formBuilder.group({
             name: ['', Validators.required],
             email: ['', Validators.required],
@@ -76,6 +87,10 @@ export class UserDetail implements OnInit {
         });
 
         this.name = this.userForm.controls['name'];
+        this.email = this.userForm.controls['email'];
+        this.role = this.userForm.controls['role'];
+        this.status = this.userForm.controls['status'];
+		
     }
 
 

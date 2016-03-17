@@ -69,6 +69,7 @@ export class ContentList implements OnInit {
 
     //TODO isolate this handler for reuse
     onTypeChanged($event) {
+	    console.log(`In onTypeChanged`);
         var type = _.find(this.types, function (t) {
             return t._id === $event;
         });
@@ -78,6 +79,7 @@ export class ContentList implements OnInit {
     }
 
     getNodeTypes() {
+	    console.log(`In getNodeTypes`);	
         var that = this;
         this._tagService.getTypes()
             .subscribe(
@@ -108,7 +110,8 @@ export class ContentList implements OnInit {
 		console.log("Search clicked");
 	}
 
-	reset() {
+	reset($event) {
+		$event.preventDefault();	
 		console.log("Reset clicked");
 	}
 	

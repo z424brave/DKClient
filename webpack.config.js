@@ -14,6 +14,7 @@ var metadata = {
   baseUrl: '/',
   host: 'localhost',
   port: 3000,
+  API: 'http://localhost:3001',
   ENV: ENV,
   HMR: HMR
 };
@@ -77,7 +78,8 @@ module.exports = helpers.validate({
       'process.env': {
         'ENV': JSON.stringify(metadata.ENV),
         'NODE_ENV': JSON.stringify(metadata.ENV),
-        'HMR': HMR
+        'HMR': HMR,
+		'API': JSON.stringify(metadata.API)
       }
     })
   ],

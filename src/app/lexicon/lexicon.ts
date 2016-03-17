@@ -47,6 +47,7 @@ export class LexiconComponent implements OnInit {
     }
 
     init() {
+	    console.log(`In init in lexicon`);	
         this._tagService.getTypes()
             .subscribe(
                 types => this.lexicons = types
@@ -57,7 +58,7 @@ export class LexiconComponent implements OnInit {
     }
 
     onTypeSelectChanged(lexiconId) {
-
+	    console.log(`In onTypeSelectChanged with ${lexiconId}`);	
         this.lexicon = _.find(this.lexicons, function (t) {
             return t._id === lexiconId;
         });
