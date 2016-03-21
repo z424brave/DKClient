@@ -1,14 +1,10 @@
 import {Component} from 'angular2/core';
-import {FORM_DIRECTIVES} from 'angular2/common';
-import {Http} from 'angular2/http';
-import {tokenNotExpired} from 'angular2-jwt';
-import {CanActivate} from 'angular2/router';
-import {ROUTER_DIRECTIVES} from 'angular2/router';
-import {ComponentInstruction} from 'angular2/router';
+//import {FORM_DIRECTIVES} from 'angular2/common';
+//import {Http} from 'angular2/http';
+//import {tokenNotExpired} from 'angular2-jwt';
+import {ComponentInstruction, CanActivate} from 'angular2/router';
 import {authCheck} from '../auth/auth-check';
-import {AuthService} from '../auth/auth-service';
 import {MainMenu} from '../menu/menu-component';
-
 
 @Component({
 

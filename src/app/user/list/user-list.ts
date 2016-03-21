@@ -1,25 +1,23 @@
-import {Component} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
+//import {RouteConfig} from 'angular2/router';
+import {Router} from 'angular2/router';
+//import {RouteParams} from 'angular2/router';
+
 import {User} from '../../common/model/user/user';
 import {UserDetail} from '../detail/user-detail';
 import {UserService} from '../../common/service/user-service';
-import {OnInit} from 'angular2/core';
-import {RouteConfig} from 'angular2/router';
-import {Router} from 'angular2/router';
-import {RouteParams} from 'angular2/router';
-import {HttpClient} from '../../common/http-client';
+//import {HttpClient} from '../../common/http-client';
 import {NameSort} from '../../common/name-sort-pipe';
-
 
 @Component({
     selector: 'user-list',
     directives: [UserDetail],
-    providers: [UserService, HttpClient],
+    providers: [UserService],
     styles: [require('./user-list.css'), require('../../app.css')],
     pipes:[NameSort],
     template: require('./user-list.html')
 
 })
-
 
 export class UserList implements OnInit {
 
@@ -52,5 +50,3 @@ export class UserList implements OnInit {
     }
 
 }
-
-

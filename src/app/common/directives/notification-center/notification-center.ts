@@ -4,15 +4,12 @@ import {OnInit} from 'angular2/core';
 import {NotificationService} from '../../service/notification-service';
 import {Alert} from 'ng2-bootstrap/ng2-bootstrap';
 
-
-
 @Component({
     selector: 'notification-center',
     template: require('./notification-center.html'),
     styles: [require('./notification-center.css')],
     directives: [Alert, CORE_DIRECTIVES]
 })
-
 
 export class NotificationCenter implements OnInit {
 
@@ -32,10 +29,8 @@ export class NotificationCenter implements OnInit {
     }
 
     private onNotificationReceived(notification) {
+	    console.log(`Pushing ${JSON.stringify(notification)}`);
         this.notifications.push(notification);
     }
 
-
 }
-
-

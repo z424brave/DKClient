@@ -1,13 +1,11 @@
 import {Component} from 'angular2/core';
-import {NgForm}    from 'angular2/common';
+import {Router} from 'angular2/router';
 import {AuthService} from '../auth/auth-service';
 import {LoginUser} from '../common/model/user/login-user';
-import {Router} from 'angular2/router';
 import {UserService} from '../common/service/user-service';
 import {NotificationService} from '../common/service/notification-service';
 import {Notification} from '../common/directives/notification-center/notification';
 import {ApplicationError} from '../common/error';
-
 
 @Component({
     selector: 'login-form',
@@ -40,6 +38,7 @@ export class LoginComponent {
                 .subscribe(response => {
 				        console.log(`Response - ${response}`);
                         if (response === 'SUCCESS') {
+						    this._notificationService.publish(new Notification('Login Successful',Notification.types.SUCCESS));
                             this._router.navigate(['/Home']);
                         } else {
                             this.invalidCredentials = true;
@@ -51,6 +50,5 @@ export class LoginComponent {
         }
 
     }
-
 
 }
