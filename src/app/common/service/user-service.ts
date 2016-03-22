@@ -9,7 +9,6 @@ import {Notification} from '../directives/notification-center/notification';
 import {ApplicationError} from '../error';
 import {API_ENDPOINT} from '../../config';
 
-
 @Injectable()
 export class UserService {
 
@@ -100,10 +99,3 @@ export class UserService {
     }
 
 }
-
-
-
-
-
-
-

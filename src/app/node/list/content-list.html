@@ -26,7 +26,7 @@
                 <label for="InputType">Type</label>
                 <select class="form-control" id="InputType" [ngModel]="searchNode.type"
                         (ngModelChange)="onTypeChanged($event)">
-                    <option *ngFor="#type of types" [value]="type._id">{{type.name}}</option>
+                    <option *ngFor="#type of types" [value]="type">{{type}}</option>
                 </select>
             </div>
         </div>
@@ -70,7 +70,7 @@
         <td (click)="onSelect(node)">{{node.created | isoDate: "d mmmm yyyy" }}</td>
         <td (click)="onSelect(node)">{{node.name}}</td>
         <td (click)="onSelect(node)">{{node.user.name}}</td>
-        <td (click)="onSelect(node)">{{node.type.name}}</td>
+        <td (click)="onSelect(node)">{{node.type}}</td>
         <td class="delete-cell">
             <i *ngIf="node.user._id === currentUser._id || currentUser.role === 'admin'"
                (click)="deleteNode($event, node._id)" class="fa fa-minus-square"></i>

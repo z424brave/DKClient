@@ -24,6 +24,8 @@ export class ContentEditor implements OnInit, AfterViewChecked {
     }
 
     ngOnInit() {
+	
+		console.log(`in ngOnInit in editor`);
         //
         //var textArea = this.elementRef.nativeElement.querySelector('textarea');
         //textArea.innerHTML = this.value;

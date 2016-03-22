@@ -2,9 +2,9 @@
 <h1>Lexicon management</h1>
 <div class="row">
     <div class="col-md-6">
-        <label for="InputType">Select a lexicon</label>
+        <label for="InputLexicon">Select a lexicon</label>
         <select class="form-control" [(ngModel)]="type"
-                (ngModelChange)="onTypeSelectChanged($event)" id="InputType">
+                (ngModelChange)="onLexiconSelectChanged($event)" id="InputLexicon">
             <option *ngFor="#lexicon of lexicons" [value]="lexicon._id">{{lexicon.name}}</option>
         </select>
     </div>
@@ -21,7 +21,7 @@
         <div class="col-md-6">
             <div class="form-inline">
                 <span><update-textfield [value]="lexicon"
-                                        (changeEmitter)="onTypeUpdated($event)"></update-textfield></span>
+                                        (changeEmitter)="onLexiconUpdated($event)"></update-textfield></span>
                 <span *ngIf="confirmDelete">
                      <button type="submit" class="btn btn-success pull-right" (click)="cancelDelete()">Cancel</button>
                     <button type="submit" class="btn btn-danger pull-right" (click)="doDeleteLexicon()">Delete lexicon ?

@@ -48,23 +48,6 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8">
-            <tabset>
-                <tab *ngFor="#tabz of tabs"
-                     [heading]="tabz.title"
-                     [active]="tabz.active"
-                     (deselect)="tabz.active = false"
-                     (select)="selectTab(tabz)"
-                     [disabled]="tabz.disabled"
-                >
-                    <div>
-                        <content-editor [value]="tabz.content" [language]="tabz.language"
-                                        (valueChange)="onEditorContentChanged($event)" [isLast]="tabz.isLast">
-                        </content-editor>
-                    </div>
-        </tab>
-        </tabset>
-    </div>
         <div *ngIf="!isNewNode" class="col-md-4">
             <h3>History</h3>
             <ul class="fa-ul">

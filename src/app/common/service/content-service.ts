@@ -44,6 +44,7 @@ export class ContentService {
         return Observable.create(observer => {
             this._httpClient.get(this.baseUrl.concat('user/' + userId))
                 .map((responseData) => {
+					console.log(`getUserNodes - ${JSON.stringify(responseData)}`);
                     return responseData.json();
                 })
                 .subscribe(

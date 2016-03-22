@@ -1,13 +1,13 @@
 import {Component, OnInit, EventEmitter} from 'angular2/core';
+import {ComponentInstruction, CanActivate} from 'angular2/router';
+import {FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/common';
+
 import {Lexicon} from './../common/model/lexicon/lexicon';
+import {Tag} from '../common/model/lexicon/tag';
+
 import {TagService} from './../common/service/tag-service';
 import {authCheck} from '../auth/auth-check';
-import {ComponentInstruction} from 'angular2/router';
-import {CanActivate} from 'angular2/router';
-import {Tag} from '../common/model/lexicon/tag';
 import {MainMenu} from '../menu/menu-component';
-import {FORM_DIRECTIVES} from 'angular2/common';
-import {CORE_DIRECTIVES} from 'angular2/common';
 import {UpdateTextfield} from '../common/directives/update-textfield/update-textfield';
 
 let _ = require('lodash');
@@ -17,12 +17,12 @@ let _ = require('lodash');
     styles: [require('./lexicon.css'), require('../app.css')],
     providers: [TagService, CORE_DIRECTIVES, FORM_DIRECTIVES,],
     directives: [UpdateTextfield, MainMenu]
-
 })
 
 @CanActivate((next: ComponentInstruction, previous: ComponentInstruction) => {
     return authCheck('admin', next, previous);
 })
+
 export class LexiconComponent implements OnInit {
 
     lexicons: Lexicon[];
@@ -48,17 +48,17 @@ export class LexiconComponent implements OnInit {
 
     init() {
 	    console.log(`In init in lexicon`);	
-        this._tagService.getTypes()
+        this._tagService.getLexicons()
             .subscribe(
-                types => this.lexicons = types
+                data => this.lexicons = data
             );
         this.lexicon = new Lexicon();
         this.newLexicon = new Lexicon();
         this.newTag = new Tag();
     }
 
-    onTypeSelectChanged(lexiconId) {
-	    console.log(`In onTypeSelectChanged with ${lexiconId}`);	
+    onLexiconSelectChanged(lexiconId) {
+	    console.log(`In onLexiconSelectChanged with ${lexiconId}`);	
         this.lexicon = _.find(this.lexicons, function (t) {
             return t._id === lexiconId;
         });
@@ -72,19 +72,18 @@ export class LexiconComponent implements OnInit {
         this.newTag = new Tag();
     }
 
-
     createLexicon() {
         var that = this;
         if (this.newLexicon.name) {
             this._tagService.saveLexicon(this.newLexicon)
                 .subscribe(
                     lexicon => {
-                        this._tagService.getTypes()
+                        this._tagService.getLexicons()
                             .subscribe(
-                                types => {
-                                    that.lexicons = types;
+                                data => {
+                                    that.lexicons = data;
                                     that.newLexicon = new Lexicon();
-                                    that.onTypeSelectChanged(lexicon._id);
+                                    that.onLexiconSelectChanged(lexicon._id);
                                 }
                             );
                     }
@@ -112,12 +111,11 @@ export class LexiconComponent implements OnInit {
             );
     }
 
-
     addTag() {
         if (this.newTag.name) {
             this._tagService.addTag(this.lexicon._id, this.newTag)
                 .subscribe(res =>
-                    this.onTypeSelectChanged(this.lexicon._id)
+                    this.onLexiconSelectChanged(this.lexicon._id)
                 );
         }
     }
@@ -125,12 +123,11 @@ export class LexiconComponent implements OnInit {
     deleteTag(tagId) {
         this._tagService.deleteTag(this.lexicon._id, tagId)
             .subscribe(res =>
-                this.onTypeSelectChanged(this.lexicon._id)
+                this.onLexiconSelectChanged(this.lexicon._id)
             );
     }
 
-
-    onTypeUpdated(type: Lexicon) {
+    onLexiconUpdated(lexicon: Lexicon) {
         this._tagService.updateLexicon(this.lexicon);
     }
 
@@ -138,6 +135,5 @@ export class LexiconComponent implements OnInit {
         this._tagService.updateTag(this.lexicon._id, tag);
 
     }
-
 
 }

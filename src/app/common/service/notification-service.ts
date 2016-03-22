@@ -1,5 +1,4 @@
 import {Injectable, EventEmitter} from 'angular2/core';
-import {Alert} from '../../../../node_modules/ng2-bootstrap/ng2-bootstrap';
 import {Notification} from './../directives/notification-center/notification';
 import {ApplicationError} from '../error';
 
@@ -9,13 +8,12 @@ export class NotificationService {
     eventBus: EventEmitter<any>;
     private defaultTimeout: number = 4000;
 
-
     constructor() {
         this.eventBus = new EventEmitter();
     }
 
     publish(notification: Notification) {
-
+	    console.log(`Publishing : ${JSON.stringify(notification)}`);
         if (notification.type === Notification.types.SUCCESS) {
             var successMessage = {
                 msg: notification.message,
@@ -45,4 +43,3 @@ export class NotificationService {
     }
 
 }
-

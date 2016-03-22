@@ -41,52 +41,43 @@ export class ContentList implements OnInit {
     nodeEmitter: EventEmitter<ContentNode>;
     //Search form select values
     statuses = ['active', 'deleted'];
-    types = [];
+    types = ['text','html'];
     users = [];
     currentUser: User;
 
     getUserNodes() {
-        var that = this;
-		console.log(`in getUserNodes for ${this._authService.currentUser._id}`);
+
+	console.log(`in getUserNodes for ${this._authService.currentUser._id}`);
         this._contentService.getUserNodes(this._authService.currentUser._id)
             .subscribe(
                 data => {
-                    that.nodes = data;
-                    that.currentUser = this._authService.currentUser;
+                    this.nodes = data;
+                    this.currentUser = this._authService.currentUser;
                 }
             );
-    }
+
+	}
 
     getUserList() {
-        var that = this;
+
         this._userService.getUsers()
             .subscribe(
                 data => {
-                    that.users = data;
-                }
+                    this.users = data;
+				}
             );
+			
     }
 
     //TODO isolate this handler for reuse
     onTypeChanged($event) {
-	    console.log(`In onTypeChanged`);
+		console.log("In onTypeChanged");	
         var type = _.find(this.types, function (t) {
             return t._id === $event;
         });
         this.searchNode.tags = [];
         this.searchNode.type = type;
         this.nodeEmitter.emit(this.searchNode);
-    }
-
-    getNodeTypes() {
-	    console.log(`In getNodeTypes`);	
-        var that = this;
-        this._tagService.getTypes()
-            .subscribe(
-                data => {
-                    that.types = data;
-                }
-            );
     }
 
     deleteNode($event, nodeId) {
@@ -101,8 +92,8 @@ export class ContentList implements OnInit {
         this._router.navigate(['ContentDetail', {id: node._id}]);
     }
 
-
     newContent() {
+		console.log("In newContent");	
         this._router.navigate(['ContentDetail', {id: undefined}]);
     }
 
@@ -110,15 +101,13 @@ export class ContentList implements OnInit {
 		console.log("Search clicked");
 	}
 
-	reset($event) {
-		$event.preventDefault();	
+	reset() {
 		console.log("Reset clicked");
 	}
 	
     ngOnInit() {
         this.getUserNodes();
         this.getUserList();
-        this.getNodeTypes();
     }
 
 }

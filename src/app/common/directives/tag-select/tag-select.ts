@@ -1,10 +1,11 @@
-import {Component, EventEmitter} from 'angular2/core';
+import {Component, EventEmitter, Input, OnInit} from 'angular2/core';
 import {CORE_DIRECTIVES} from 'angular2/common';
-import {OnInit} from 'angular2/core';
+
 import {Tag} from '../../model/lexicon/tag';
-import {Input} from 'angular2/core';
-import {TagService} from '../../service/tag-service';
+import {Lexicon} from '../../model/lexicon/lexicon';
 import {ContentNode} from '../../model/node/content-node';
+import {TagService} from '../../service/tag-service';
+
 let _ = require('lodash');
 
 @Component({
@@ -15,12 +16,11 @@ let _ = require('lodash');
     providers: [TagService]
 })
 
-
 export class TagSelect implements OnInit {
 
-    @Input()nodeEmitter: EventEmitter<ContentNode>;
-
-
+    @Input() nodeEmitter: EventEmitter<ContentNode>;
+    @Input() tags: Array<Tag> = [];
+	
     constructor(private _tagService: TagService) {
 
     }
@@ -29,11 +29,11 @@ export class TagSelect implements OnInit {
 
     selectedTags: Array<Tag> = [];
 
-    tags: Array<Tag> = [];
-
+	lexicons: Array<Lexicon> = [];
+	
     selectTag(tag) {
 
-        console.log('selected tag: ' + tag);
+        console.log('selected tag: ' + tag.name);
         if (_.findIndex(this.selectedTags, function (currentTag) {
                 return currentTag._id === tag._id;
             }) === -1) {
@@ -41,7 +41,7 @@ export class TagSelect implements OnInit {
         } else {
             this.removeTag(tag);
         }
-        this.node.tags = this.selectedTags;
+        this.node.tags = _.map(this.selectedTags, '_id');
 
     }
 
@@ -52,22 +52,47 @@ export class TagSelect implements OnInit {
 
     }
 
-
     onNodeChange(node: ContentNode) {
-	    console.log(`in onNodeChange - ${node.name}`);
-        this._tagService.getAllTags().subscribe(
-            tags => this.tags = tags
-        );
-        this.selectedTags = node.tags;
+	    console.log(`in onNodeChange - ${JSON.stringify(node)}`);		
+ //       this._tagService.getTags(node.type._id).subscribe(
+ //           tags => this.tags = tags
+ //       );
+	    console.log(`in onNodeChange - ${JSON.stringify(node.tags)}`); 
+        this.buildSelectedTags(node.tags);
         this.node = node;
+
     }
 
+	buildSelectedTags(nodeTags: Array<string>) {
+
+	    console.log(`in buildSelectedTags - ${JSON.stringify(this.selectedTags)}`);
+
+        for (var nodeTag of nodeTags) {
+            var selectedTag = _.find(this.tags, function (t) {
+                return t._id === nodeTag;
+            });
+            if (selectedTag) {
+                this.selectedTags.push(selectedTag);
+            }
+        }
+	
+	    console.log(`in buildSelectedTags - ${JSON.stringify(this.selectedTags)}`); 	
+
+	}
 
     ngOnInit() {
+		
         this.nodeEmitter.subscribe(node =>
             this.onNodeChange(node));
 
+        this._tagService.getLexicons().subscribe(
+            data => {
+				this.lexicons = data;
+                this.tags = _.flatMap(_.map(this.lexicons, 'tags'));   				
+				console.log(`in ngOnInit - Tags : ${this.tags.length} - ${JSON.stringify(this.tags)}`);	
+				console.log(`in ngOnInit - Lexicons : ${this.lexicons.length} - ${JSON.stringify(this.lexicons)}`);					
+			}	
+        );					
     }
-
 
 }

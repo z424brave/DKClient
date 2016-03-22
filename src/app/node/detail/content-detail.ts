@@ -12,7 +12,6 @@ import {Media} from './../../common/model/node/media';
 import {ContentTab} from './../tab/content-tab';
 import {TagSelect} from '../../common/directives/tag-select/tag-select';
 import {Tag} from '../../common/model/lexicon/tag';
-import {Lexicon} from '../../common/model/lexicon/lexicon';
 import {MainMenu} from '../../menu/menu-component';
 import {authCheck} from '../../auth/auth-check';
 import {AuthService} from '../../auth/auth-service';
@@ -36,9 +35,10 @@ declare var tinymce: any;
 @CanActivate((next: ComponentInstruction, previous: ComponentInstruction) => {
     return authCheck('user', next, previous);
 })
+
 export class ContentDetail implements OnInit {
 
-    types: Lexicon[] = [];
+    types: String[] = ['text','html'];
     node: ContentNode;
     content: Content;
     nodeEmitter: EventEmitter<ContentNode>;
@@ -62,21 +62,13 @@ export class ContentDetail implements OnInit {
     private activeTab: ContentTab;
 
     ngOnInit() {
+	
         this.node = new ContentNode();
-        this.node.type = new Lexicon();
         this.content = new Content();
         this.content.media = [];
         let id = this._routeParams.get('id');
+        this.initNode(id);		
 
-        var that = this;
-		console.log(`Calling getTypes - ${id}`);
-        this._tagService.getTypes()
-            .subscribe(
-                types => {
-                    that.types = types;
-                    that.initNode(id);
-                }
-            );
     }
 
     initNode(id: string) {
@@ -107,18 +99,18 @@ export class ContentDetail implements OnInit {
 
     loadNode(id: string, initTabs: boolean) {
 
-        var that = this;
+		console.log(`In loadNode - ${id} : ${initTabs}`);
         this._contentService.getNode(id)
             .subscribe(
                 data => {
-                    that.node = data;
-                    that.processTags(data);
-                    that.initContentTabs(initTabs);
+                    this.node = data;
+					this.node.tags = data.tags;
+					this.nodeEmitter.emit(this.node);
+                    this.initContentTabs(initTabs);
                 }
             );
 
     }
-
 
     processTags(node) {
         var tagIds: any[] = this.node.tags;
@@ -135,7 +127,6 @@ export class ContentDetail implements OnInit {
         this.node.tags = tags;
         this.nodeEmitter.emit(this.node);
     }
-
 
     createContentTabs() {
 
@@ -225,7 +216,6 @@ export class ContentDetail implements OnInit {
 
     }
 
-
     copyVersionContent(content: Content){
 	    console.log(`New content should be ${content.versionMessage}`);
         for(var media of content.media){
@@ -249,7 +239,6 @@ export class ContentDetail implements OnInit {
             }
         }
     }
-
 
     onTypeChanged($event) {
         var type = _.find(this.types, function (t) {
@@ -291,6 +280,3 @@ export class ContentDetail implements OnInit {
     }
 
 }
-
-
-

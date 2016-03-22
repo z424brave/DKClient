@@ -10,7 +10,6 @@ import {NotificationService} from './notification-service';
 import {Tag} from '../model/lexicon/tag';
 import {LegacyHtmlParser} from 'angular2/src/compiler/legacy_template';
 import {Lexicon} from '../model/lexicon/lexicon';
-
 @Injectable()
 export class TagService {
 
@@ -18,15 +17,14 @@ export class TagService {
 
     constructor(private _httpClient: HttpClient,
                 private _notificationService: NotificationService) {
-        this.baseUrl = API_ENDPOINT.concat('/lexicons/');
+        this.baseUrl = API_ENDPOINT.concat('/tags/');
     }
 
-    getLexicons() {
+    getTypes() {
         var that = this;
         return Observable.create(observer => {
             this._httpClient.get(this.baseUrl)
                 .map((responseData) => {
-				    console.log(`Lexicons : ${JSON.stringify(responseData)}`);
                     return responseData.json();
                 })
                 .subscribe(
@@ -34,7 +32,7 @@ export class TagService {
                     err => {
                         that._notificationService.handleError(
                             new ApplicationError(
-                                'Error loading lexicons',
+                                'Error loading types',
                                 err));
                     }
                     ,
@@ -44,7 +42,7 @@ export class TagService {
     }
 
     getTags(lexiconId) {
-	    console.log(`In getTags - ${lexiconId}`);
+	    console.log(`in getTags - ${lexiconId}`);
         var that = this;
         return Observable.create(observer => {
             this._httpClient.get(this.baseUrl.concat(lexiconId).concat('/tags/'))
@@ -65,6 +63,27 @@ export class TagService {
         });
     };
 
+    getAllTags() {
+	    console.log(`in getAllTags`);
+        var that = this;
+        return Observable.create(observer => {
+            this._httpClient.get(API_ENDPOINT.concat('/tags/'))
+                .map((responseData) => {
+                    return responseData.json();
+                })
+                .subscribe(
+                    data => observer.next(data),
+                    err => {
+                        that._notificationService.handleError(
+                            new ApplicationError(
+                                'Error loading tags',
+                                err));
+                    }
+                    ,
+                    () => observer.complete()
+                );
+        });
+    };	
     updateTag(lexiconId: string, tag: Tag) {
         var that = this;
         console.log('update : ' + tag);
@@ -89,6 +108,7 @@ export class TagService {
             }
         );
     }
+
 
     saveLexicon(lexicon: Lexicon) {
         var that = this;
@@ -147,6 +167,7 @@ export class TagService {
 
     }
 
+
     deleteLexicon(lexicon: Lexicon) {
         var that = this;
         return Observable.create(observer => {
@@ -176,6 +197,7 @@ export class TagService {
 
     }
 
+
     addTag(lexiconId: string, tag: Tag) {
         var that = this;
         return Observable.create(observer => {
@@ -201,6 +223,7 @@ export class TagService {
 
     }
 
+
     deleteTag(lexiconId: string, tagId: string) {
         var that = this;
         return Observable.create(observer => {
@@ -225,5 +248,6 @@ export class TagService {
         );
 
     }
+
 
 }
