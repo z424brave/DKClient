@@ -25,9 +25,9 @@
             </div>
             <div class="form-group" *ngIf="!isNewNode">
                 <label for="InputTypeTxt">Type</label>
-                <input type="text" [(ngModel)]="type" ngControl="type"
+                <input type="text" [(ngModel)]="node.type" ngControl="type"
                        class="form-control" id="InputTypeTxt"
-                       placeholder="Type" readonly>
+                       placeholder="Type" readonly>			
             </div>
         </div>
         <div class="col-md-8">
@@ -50,28 +50,28 @@
     <div class="row">
         <div class="col-md-8">
             <tabset>
-                <tab *ngFor="#tabz of tabs"
-                     [heading]="tabz.title"
-                     [active]="tabz.active"
-                     (deselect)="tabz.active = false"
-                     (select)="selectTab(tabz)"
-                     [disabled]="tabz.disabled"
-                >
+                <tab *ngFor="#languageTab of languageTabs"
+                     [heading]="languageTab.title"
+                     [active]="languageTab.active"
+                     (deselect)="languageTab.active = false"
+                     (select)="selectTab(languageTab)"
+                     [disabled]="languageTab.disabled">
+					 
                     <div>
-                        <content-editor [value]="tabz.content" [language]="tabz.language"
-                                        (valueChange)="onEditorContentChanged($event)" [isLast]="tabz.isLast">
+                        <content-editor *ngIf="languageTab.active" [editorContent]="languageTab.content" [language]="languageTab.language" [active]="languageTab.active" 
+                                        (editorContentChange)="onEditorContentChanged($event)" [isLast]="languageTab.isLast">
                         </content-editor>
                     </div>
-        </tab>
+				</tab>
         </tabset>
-    </div>
+		</div>
         <div *ngIf="!isNewNode" class="col-md-4">
             <h3>History</h3>
             <ul class="fa-ul">
-                <li *ngFor="#content of node.content" class="content-version">
+                <li *ngFor="#content of node.content | versionSort" class="content-version">
                     <span *ngIf="content.versionMessage" (click)="copyVersionContent(content)">
                         <i class="fa-li fa fa-file-code-o"></i>
-                        {{content.versionMessage}}
+                        {{content.versionNo}} - {{content.versionMessage}}
                     </span>
                 </li>
             </ul>

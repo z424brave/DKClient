@@ -46,10 +46,13 @@ export class TagSelect implements OnInit {
     }
 
     removeTag(tag) {
+	
+		console.log(`in removeTag ${JSON.stringify(tag)}`);
         _.remove(this.selectedTags, function (currentTag) {
             return currentTag._id === tag._id;
         });
-
+        this.node.tags = _.map(this.selectedTags, '_id');
+		
     }
 
     onNodeChange(node: ContentNode) {
@@ -64,6 +67,8 @@ export class TagSelect implements OnInit {
     }
 
 	buildSelectedTags(nodeTags: Array<string>) {
+
+		while(this.selectedTags.length > 0) { this.selectedTags.pop(); }
 
 	    console.log(`in buildSelectedTags - ${JSON.stringify(this.selectedTags)}`);
 

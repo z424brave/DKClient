@@ -1,13 +1,13 @@
 /// <reference path="../../../../typings/browser/definitions/tinymce/tinymce.d.ts" />
 //var tinymce: any = require("../../../../node_modules/tinymce/tinymce");
-import {Component, OnInit, EventEmitter} from 'angular2/core';
-import {ContentEditor} from '../editor/content-editor';
+import {Component, OnInit, Input, EventEmitter} from 'angular2/core';
 import {Router, RouteParams, CanActivate, ComponentInstruction} from 'angular2/router';
 import {CORE_DIRECTIVES, FORM_DIRECTIVES, NgForm} from 'angular2/common';
 import {TAB_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
 import {ContentNode} from './../../common/model/node/content-node';
 import {Language} from '../../common/model/language';
 import {Content} from './../../common/model/node/content';
+import {ContentEditor} from '../editor/content-editor';
 import {Media} from './../../common/model/node/media';
 import {ContentTab} from './../tab/content-tab';
 import {TagSelect} from '../../common/directives/tag-select/tag-select';
@@ -19,6 +19,7 @@ import {User} from '../../common/model/user/user';
 import {ContentService} from '../../common/service/content-service';
 import {TagService} from '../../common/service/tag-service';
 import {LanguageService} from '../../common/service/language-service';
+import {VersionSort} from '../../common/version-sort-pipe';
 import 'rxjs/Rx';
 
 let _ = require('lodash');
@@ -28,8 +29,8 @@ declare var tinymce: any;
     directives: [ContentEditor, TAB_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES, TagSelect, MainMenu],
     providers: [ContentService, TagService, LanguageService],
     template: require('./content-detail.html'),
-    styles: [require('./content.css'), require('../../app.css')],
-    inputs: ['content']
+	pipes: [VersionSort],
+    styles: [require('./content.css'), require('../../app.css')]
 })
 
 @CanActivate((next: ComponentInstruction, previous: ComponentInstruction) => {
@@ -40,12 +41,12 @@ export class ContentDetail implements OnInit {
 
     types: String[] = ['text','html'];
     node: ContentNode;
-    content: Content;
+    @Input() content: Content;
     nodeEmitter: EventEmitter<ContentNode>;
     isNewNode: boolean;
     saveAction: string;
 
-    private tabs: any[];
+    private languageTabs: any[];
     private submitted: boolean;
     private supportedLanguages = [];
 
@@ -55,7 +56,7 @@ export class ContentDetail implements OnInit {
                 private _authService: AuthService,
                 private _routeParams: RouteParams,
                 private _router: Router) {
-        this.tabs = [];
+        this.languageTabs = [];
         this.nodeEmitter = new EventEmitter();
     }
 
@@ -136,7 +137,7 @@ export class ContentDetail implements OnInit {
             media.language = new Language(language.name, language.iso3166);
             media.content = '';
             this.content.media.push(media);
-            this.tabs.push(new ContentTab(
+            this.languageTabs.push(new ContentTab(
                 media,
                 counter++ === 0,
                 true
@@ -157,13 +158,13 @@ export class ContentDetail implements OnInit {
             newMedia.language = media.language;
             this.content.media.push(newMedia);
             if (init) {
-                this.tabs.push(new ContentTab(
+                this.languageTabs.push(new ContentTab(
                     newMedia,
                     counter++ === 1,
                     counter === medialist.length + 1
                 ));
             } else {
-                var tab = _.find(this.tabs, {title: newMedia.language.iso3166});
+                var tab = _.find(this.languageTabs, {title: newMedia.language.iso3166});
                 tab.media = newMedia;
             }
         }
@@ -216,18 +217,34 @@ export class ContentDetail implements OnInit {
 
     }
 
-    copyVersionContent(content: Content){
-	    console.log(`New content should be ${content.versionMessage}`);
-        for(var media of content.media){
-            var tab = this.getTabForLanguage(media.language);
-            tab.content = media.content;
-        }
+    copyVersionContent(changeContent: Content){
+	
+	    console.log(`New content should be ${changeContent.versionMessage}`);
+		this.content.versionMessage = changeContent.versionMessage;
+	    console.log(`New content has ${changeContent.media.length} media`);	
+
+		while(this.languageTabs.length > 0) { this.languageTabs.pop(); }	
+        
+		let counter = 1;
+        for (var media of changeContent.media) {
+            var newMedia = new Media();
+            newMedia.content = media.content;
+            newMedia.language = media.language;
+            this.content.media.push(newMedia);
+            this.languageTabs.push(new ContentTab(
+                newMedia,
+                counter++ === 1,
+                counter === changeContent.media.length + 1
+            ));
+
+        }		
 
     }
 
     getTabForLanguage(language: Language){
-        return _.find(this.tabs, function(tab: ContentTab){
-            return tab.media.language.iso3166 = language.iso3166;
+	    console.log(`getTabForLanguage - passed ${JSON.stringify(language)}`);	
+        return _.find(this.languageTabs, function(tab: ContentTab){
+            return tab.media.language.iso3166 == language.iso3166;
         });
 
     }
@@ -251,12 +268,11 @@ export class ContentDetail implements OnInit {
 
     onVersionMessageChanged($event) {
         this.content.versionMessage = $event;
-
     }
 
     onEditorContentChanged($event) {
+	    console.log(`onEditorContentChanged ${JSON.stringify($event)}`);	
         this.activeTab.media.content = $event;
-
     }
 
     selectTab(tab) {
