@@ -1,4 +1,4 @@
-import {Injectable, EventEmitter} from 'angular2/core';
+import {Injectable, EventEmitter} from '@angular/core';
 import {Notification} from './../directives/notification-center/notification';
 import {ApplicationError} from '../error';
 

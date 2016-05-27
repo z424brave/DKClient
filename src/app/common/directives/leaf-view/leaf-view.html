@@ -1,0 +1,14 @@
+<div class="wrap">
+    <div class="new-media">
+        <input class="new-folder-btn" type="text" name="newFolder" value="">
+        <input class="new-folder-btn btn btn-success" type="submit" value="Add Folder" (click)="newFolder()">
+        <input class="new-media-btn btn btn-success" type="submit" value="Add Media" (click)="newMedia()">
+    </div>
+    <div *ngFor="let leaf of leafs | paginate: { itemsPerPage: leafsPerPage, currentPage: p }" class="box">
+        <div class="boxInner" >
+            <img src="{{ 'https://d2mgfhkgxmsoab.cloudfront.net/' + leaf.key }}"/>
+            <div class="titleBox">{{ leaf.name }}</div>
+        </div>
+    </div>
+</div>
+<pagination-controls (pageChange)="p = $event" autoHide="true"></pagination-controls>

@@ -1,4 +1,4 @@
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '../http-client';
 import {API_ENDPOINT} from '../../config';
 import {Observable} from 'rxjs/Observable';
@@ -20,7 +20,7 @@ export class LanguageService {
     getLanguages() {
         var that = this;
         return Observable.create(observer => {
-            this._httpClient.get(this.baseUrl)
+            this._httpClient.get(this.baseUrl + 'list')
                 .map((responseData) => {
                     return responseData.json();
                 })

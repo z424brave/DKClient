@@ -20,7 +20,7 @@
                 <select class="form-control" required id="InputType" [ngModel]="type"
                         (ngModelChange)="onTypeChanged($event)"
                         ngControl="type">
-                    <option *ngFor="#type of types" [value]="type">{{type}}</option>
+                    <option *ngFor="let type of types" [value]="type">{{type}}</option>
                 </select>
             </div>
             <div class="form-group" *ngIf="!isNewNode">
@@ -33,7 +33,7 @@
         <div class="col-md-8">
             <div class="form-group">
                 <label>Tags</label>
-                <tag-select [(nodeEmitter)]="nodeEmitter"></tag-select>
+                <update-from-select [allValues]="allValues"></update-from-select>
             </div>
         </div>
     </div>
@@ -47,29 +47,28 @@
                placeholder="Version message" required>
     </div>
 
-    <div class="row">
+    <div class="row" *ngIf="node.type==='text'">
         <div class="col-md-8">
             <tabset>
-                <tab *ngFor="#languageTab of languageTabs"
+                <tab *ngFor="let languageTab of languageTabs"
                      [heading]="languageTab.title"
                      [active]="languageTab.active"
                      (deselect)="languageTab.active = false"
                      (select)="selectTab(languageTab)"
                      [disabled]="languageTab.disabled">
-					 
-                    <div>
-                        <content-editor *ngIf="languageTab.active" [editorContent]="languageTab.content" [language]="languageTab.language" [active]="languageTab.active" 
-                                        (editorContentChange)="onEditorContentChanged($event)" [isLast]="languageTab.isLast">
-                        </content-editor>
+                    <inline-editor *ngIf="currentVersion" [(ngModel)]="editorContent" (change)="editorContentChanged($event)" [config]="{uiColor: '#99000',filebrowserBrowseUrl: 'http://localhost:3000/media'}">
+                    </inline-editor>
+                    <div [hidden]="currentVersion">
+                        {{editorContent}}
                     </div>
-				</tab>
-        </tabset>
+                </tab>
+			</tabset>
 		</div>
         <div *ngIf="!isNewNode" class="col-md-4">
             <h3>History</h3>
             <ul class="fa-ul">
-                <li *ngFor="#content of node.content | versionSort" class="content-version">
-                    <span *ngIf="content.versionMessage" (click)="copyVersionContent(content)">
+                <li *ngFor="let content of node.content | versionSort" class="content-version">
+                    <span (click)="changeVersion(content)">
                         <i class="fa-li fa fa-file-code-o"></i>
                         {{content.versionNo}} - {{content.versionMessage}}
                     </span>
@@ -77,7 +76,44 @@
             </ul>
         </div>
     </div>
-    <div class="form-buttons">
+    <div class="row" *ngIf="node.type==='html'">
+        <div class="col-md-8">
+            <tabset>
+                <tab *ngFor="let languageTab of languageTabs"
+                     [heading]="languageTab.title"
+                     [active]="languageTab.active"
+                     (deselect)="languageTab.active = false"
+                     (select)="selectTab(languageTab)"
+                     [disabled]="languageTab.disabled">
+                    <inline-editor *ngIf="currentVersion" [(ngModel)]="editorContent" (change)="editorContentChanged($event)" [config]="{uiColor: '#99000',filebrowserBrowseUrl: 'http://localhost:3000/media'}">
+                    </inline-editor>
+                    <div [hidden]="currentVersion">
+                        {{editorContent}}
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+        <div *ngIf="!isNewNode" class="col-md-4">
+            <h3>History</h3>
+            <ul class="fa-ul">
+                <li *ngFor="let content of node.content | versionSort" class="content-version">
+                    <span (click)="changeVersion(content)">
+                        <i class="fa-li fa fa-file-code-o"></i>
+                        {{content.versionNo}} - {{content.versionMessage}}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row" *ngIf="(node.type==='image')">
+        <div *ngIf="!isNewNode">
+            <img class="content-image" src="{{ 'https://d2mgfhkgxmsoab.cloudfront.net/' + editorContent }}"/>
+        </div>
+        <div *ngIf="isNewNode">
+            <file-upload></file-upload>
+        </div>
+    </div>
+    <div *ngIf="currentVersion" class="form-buttons">
         <button type="submit" class="btn btn-success">{{saveAction}}</button>
         <button class="btn btn-default" (click)="translate($event)">Translate</button>
         <button class="btn btn-default" (click)="publish($event)">Publish</button>

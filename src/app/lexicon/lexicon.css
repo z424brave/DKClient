@@ -5,6 +5,7 @@
 .tag-table {
 
     max-width: 550px;
+    min-height: 400px;
 }
 
 .text-input {

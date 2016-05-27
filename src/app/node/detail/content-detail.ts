@@ -1,32 +1,30 @@
-/// <reference path="../../../../typings/browser/definitions/tinymce/tinymce.d.ts" />
-//var tinymce: any = require("../../../../node_modules/tinymce/tinymce");
-import {Component, OnInit, Input, EventEmitter} from 'angular2/core';
-import {Router, RouteParams, CanActivate, ComponentInstruction} from 'angular2/router';
-import {CORE_DIRECTIVES, FORM_DIRECTIVES, NgForm} from 'angular2/common';
-import {TAB_DIRECTIVES} from 'ng2-bootstrap/ng2-bootstrap';
-import {ContentNode} from './../../common/model/node/content-node';
-import {Language} from '../../common/model/language';
-import {Content} from './../../common/model/node/content';
-import {ContentEditor} from '../editor/content-editor';
-import {Media} from './../../common/model/node/media';
-import {ContentTab} from './../tab/content-tab';
-import {TagSelect} from '../../common/directives/tag-select/tag-select';
-import {Tag} from '../../common/model/lexicon/tag';
-import {MainMenu} from '../../menu/menu-component';
-import {authCheck} from '../../auth/auth-check';
-import {AuthService} from '../../auth/auth-service';
-import {User} from '../../common/model/user/user';
-import {ContentService} from '../../common/service/content-service';
-import {TagService} from '../../common/service/tag-service';
-import {LanguageService} from '../../common/service/language-service';
-import {VersionSort} from '../../common/version-sort-pipe';
-import 'rxjs/Rx';
+import {OnInit, Component} from "@angular/core";
+import {Router, RouteParams, CanActivate, ComponentInstruction} from "@angular/router-deprecated";
+import {CORE_DIRECTIVES, FORM_DIRECTIVES} from "@angular/common";
+import {TAB_DIRECTIVES} from "ng2-bootstrap/ng2-bootstrap";
+import {ContentNode} from "./../../common/model/node/content-node";
+import {Language} from "../../common/model/language";
+import {Content} from "./../../common/model/node/content";
+import {User} from "../../common/model/user/user";
+import {Media} from "./../../common/model/node/media";
+import {Tag} from "../../common/model/lexicon/tag";
+import {UpdateFromSelectValue} from "../../common/model/update-from-select-value";
+import {ContentTab} from "./../tab/content-tab";
+import {UpdateFromSelect} from "../../common/directives/update-from-select/update-from-select";
+import {InlineEditor} from "../../common/directives/inline-editor/inline-editor";
+import {MainMenu} from "../../menu/menu-component";
+import {authCheck} from "../../auth/auth-check";
+import {AuthService} from "../../auth/auth-service";
+import {ContentService} from "../../common/service/content-service";
+import {LanguageService} from "../../common/service/language-service";
+import {VersionSort} from "../../common/version-sort-pipe";
+import {TagService} from "../../common/service/tag-service";
+import {FileUpload} from "../../common/directives/file-upload/file-upload";
 
 let _ = require('lodash');
-declare var tinymce: any;
 
 @Component({
-    directives: [ContentEditor, TAB_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES, TagSelect, MainMenu],
+    directives: [InlineEditor, TAB_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES, MainMenu, UpdateFromSelect, FileUpload],
     providers: [ContentService, TagService, LanguageService],
     template: require('./content-detail.html'),
 	pipes: [VersionSort],
@@ -39,14 +37,20 @@ declare var tinymce: any;
 
 export class ContentDetail implements OnInit {
 
-    types: String[] = ['text','html'];
+    content: Content;
+	currentVersion: boolean;
+    allValues: Array<UpdateFromSelectValue> = [];
+    activeTab: ContentTab;
+	editorContent: string;
+	testContent: string = "Hello me";	
+	types: String[] = ['text','html','image'];
     node: ContentNode;
-    @Input() content: Content;
-    nodeEmitter: EventEmitter<ContentNode>;
+	tags: Array<Tag>;
+
     isNewNode: boolean;
     saveAction: string;
 
-    private languageTabs: any[];
+    private languageTabs: Array<ContentTab>;
     private submitted: boolean;
     private supportedLanguages = [];
 
@@ -57,83 +61,131 @@ export class ContentDetail implements OnInit {
                 private _routeParams: RouteParams,
                 private _router: Router) {
         this.languageTabs = [];
-        this.nodeEmitter = new EventEmitter();
-    }
-
-    private activeTab: ContentTab;
-
-    ngOnInit() {
-	
-        this.node = new ContentNode();
-        this.content = new Content();
-        this.content.media = [];
-        let id = this._routeParams.get('id');
-        this.initNode(id);		
+        var media = new Media();
+        media.language = new Language('English', 'EN');
+ 		this.activeTab = new ContentTab(media, true, true);
+		this.editorContent = this.activeTab.content;
 
     }
 
-    initNode(id: string) {
+    private _getLanguages() {
+
+        this._languageService.getLanguages()
+            .subscribe(languages => {
+                this.supportedLanguages = languages;
+                console.log(`Languages : ${JSON.stringify(languages)}`);
+                this.createContentTabs();
+            });
+    }
+
+    private _getAllTags() {
+
+        console.log(`in content-details / getAllTags`);
+        this._tagService.getLexicons().subscribe(
+            data => {
+
+                let tags = _.flatMap(_.map(data, 'tags'));
+                this.allValues = tags.map((tag: Tag) => {
+                    return new UpdateFromSelectValue(tag._id, tag.name);
+                });
+
+                console.log(`in getAllTags - Tags : ${this.allValues.length} - ${JSON.stringify(this.allValues)}`);
+
+            }
+        );
+
+    }
+
+    private _initNode(id: string) {
         if (id) {
-            this.loadNode(id, true);
+            this._loadNode(id, true);
         } else {
-            var that = this;
+
             this.isNewNode = true;
             let user = new User();
             user._id = this._authService.currentUser._id;
             this.node.user = user;
             this.node.tags = [];
+            this.tags = [];
             this.content = new Content();
             this.content.media = [];
             this.content.user = this._authService.currentUser._id;
             this.content.versionNo = 1;
+            this.currentVersion = true;
             this.supportedLanguages = [];
-            this._languageService.getLanguages()
-                .subscribe(languages => {
-                    that.supportedLanguages = languages;
-                    this.createContentTabs();
-                });
+            this._getLanguages()
+
         }
 
         this.saveAction = this.isNewNode ? 'Save' : 'Update';
 
     }
 
-    loadNode(id: string, initTabs: boolean) {
+    private _loadNode(id: string, initTabs: boolean) {
 
-		console.log(`In loadNode - ${id} : ${initTabs}`);
+        console.log(`In loadNode - ${id} : ${initTabs}`);
         this._contentService.getNode(id)
             .subscribe(
                 data => {
                     this.node = data;
-					this.node.tags = data.tags;
-					this.nodeEmitter.emit(this.node);
+                    console.log(`Node : ${JSON.stringify(this.node)}`);
+                    this.currentVersion = false;
                     this.initContentTabs(initTabs);
+
+                    this.allValues = this.allValues.map((value) => {
+
+                        if ( this.node.tags.indexOf(value.key) > -1 ) {
+                            if (!value.selected) {
+                                value.toggleSelected();
+                            }
+                        }
+
+                        return value;
+
+                    });
+                    console.log(`set selected tags - ${JSON.stringify(this.allValues)}`);
                 }
             );
 
     }
 
-    processTags(node) {
-        var tagIds: any[] = this.node.tags;
-        var tags = [];
-        for (var tagId of tagIds) {
-            var selectedTag = _.find(node.type.tags, function (t) {
-                return t._id === tagId;
-            });
-            if (selectedTag) {
-                tags.push(selectedTag);
+    ngOnInit() {
+	
+		console.log(`In content-details / ngOnInit`);	
+        this.node = new ContentNode();
+        this.content = new Content();
+        this.content.media = [];
+        let id = this._routeParams.get('id');
+		console.log(`In ngOnInit - ${this._routeParams.get('versionNo')}`);
+        this._getAllTags();
+        this._initNode(id);
+		console.log(`In ngOnInit - ${this.editorContent} : ${JSON.stringify(this.activeTab)}`);
+
+    }
+
+	editorContentChanged(event) {
+	
+		console.log(`content-detail / editorContentChanged - ${event.target.value}`);
+		console.log(`content-detail / editorContentChanged - ${JSON.stringify(this.getTabForLanguage(this.activeTab.language))}`);		
+		this.activeTab.content = event.target.value;
+		this.getTabForLanguage(this.activeTab.language).content = event.target.value;
+        this.getTabForLanguage(this.activeTab.language).media.content = event.target.value;
+        for (let media of this.content.media) {
+            if (media.language === this.activeTab.language) {
+                media.content = event.target.value;
+                console.log(`Saving editor content : ${JSON.stringify(media.content)} for ${JSON.stringify(media.language)}`);
             }
         }
+		console.log(`content-detail / editorContentChanged - ${JSON.stringify(this.getTabForLanguage(this.activeTab.language))}`);
 
-        this.node.tags = tags;
-        this.nodeEmitter.emit(this.node);
     }
 
     createContentTabs() {
 
-        var counter = 0;
-        for (var language of this.supportedLanguages) {
-            var media = new Media();
+		console.log(`In createContentTabs`);	
+        let counter = 0;
+        for (let language of this.supportedLanguages) {
+            let media = new Media();
             media.language = new Language(language.name, language.iso3166);
             media.content = '';
             this.content.media.push(media);
@@ -147,11 +199,18 @@ export class ContentDetail implements OnInit {
     }
 
     initContentTabs(init) {
-        var counter = 1;
+
+		console.log(`In initContentTabs - ${init}`);		
+        let counter = 1;
         this.content.user = this._authService.currentUser._id;
-        this.content.versionNo = this.node.content[this.node.content.length - 1].versionNo + 1;
-		this.content.versionMessage = this.node.content[this.node.content.length - 1].versionMessage;
-        var medialist = this.node.content[this.node.content.length - 1].media;
+		let versionNo: any = this._routeParams.get('versionNo');
+		let versionNoRef = (versionNo && versionNo > 0) ? versionNo - 1 : this.node.content.length - 1;
+        this.content.versionNo = this.node.content[versionNoRef].versionNo;
+//        console.log(`initContentTabs - versionNo is : ${this.content.versionNo} / ${this.node.content[versionNoRef].versionNo}`);
+		this.currentVersion = (this.content.versionNo === this.node.content.length) ? true : false;
+        console.log(`initContentTabs : ${versionNo} : ${this.currentVersion} : ${this.node.content.length} `);
+		this.content.versionMessage = this.node.content[versionNoRef].versionMessage;
+        var medialist = this.node.content[versionNoRef].media;
         for (var media of medialist) {
             var newMedia = new Media();
             newMedia.content = media.content;
@@ -168,64 +227,101 @@ export class ContentDetail implements OnInit {
                 tab.media = newMedia;
             }
         }
+		this.activeTab = this.languageTabs[0];
+		this.editorContent = this.activeTab.content;
+		console.log(`In ngOnInit - ${this.editorContent} : ${JSON.stringify(this.activeTab)}`);		
     }
 
+    _saveTagsToNode() {
+        return this.allValues.filter((value) => {
+
+            return value.selected;
+
+        }).map((selectedValue) => {
+            return selectedValue.key;
+        });
+    }
     onSubmit(valid) {
+	
         this.submitted = true;
-        var that = this;
+
         if (valid) {
             if (this.isNewNode) {
 				console.log(`In onSubmit about to create node`);
-				console.log(JSON.stringify(this.node));				
+                this.node.tags = this._saveTagsToNode();
+                this.node.content[0] = this.content;
+				console.log(JSON.stringify(this.node));
                 this._contentService.createNode(this.node)
-                    .toPromise()
-                    .then(node => {
-						console.log(`In onSubmit about to add content to node`);
-						console.log(JSON.stringify(this.content));	
+                    .subscribe(node => {
+						console.log(JSON.stringify(this.content));
                         this.node = node;
-                        return that._contentService.addContent(this.node._id, this.content).toPromise()
+                        this._router.navigate(['ContentDetail', {id: this.node._id}]);
                     })
-                    .then(this._router.navigate(['Content']));
+
             } else {
                 //Check if content has changed. If not, discard new version.
-                var contentChanged = this.hasContentChanged(this.node.content[this.node.content.length - 1].media, this.content.media);
+				console.log(`In onSubmit checking node changed`);
+                this.node.tags = this._saveTagsToNode();
+
+				console.log(JSON.stringify(this.node));				
+                var contentChanged = ContentDetail.hasContentChanged(this.node.content[this.node.content.length - 1].media, this.content.media);
+				console.log(`In onSubmit before update node - contentChanged is ${contentChanged}`);
+
+				console.log(JSON.stringify(this.node));				
                 this._contentService.updateNode(this.node)
                     .toPromise()
-                    .then((resp) => {
+                    .then(() => {
                         if (contentChanged) {
+                            ++this.content.versionNo;
                             return this._contentService.addContent(this.node._id, this.content).toPromise()
                         } else {
                             return new Promise((resolve, reject) => resolve('ok'))
                         }
                     })
-                    .then((resp) => {
-                        that.loadNode(that.node._id, false);
+                    .then(() => {
+                        console.log(`Reloading node after update : ${this.node._id}`);
+                        this._router.navigate(['ContentDetail', {id: this.node._id}]);
                     });
 
             }
         }
+		
     }
 
-    hasContentChanged(oldMedia, newMedia) {
+    static hasContentChanged(oldMedia, newMedia) {
+
+		console.log(`old : ${JSON.stringify(oldMedia)} / new : ${JSON.stringify(newMedia)}`);		
         for (var media of oldMedia) {
-            var content = _.find(newMedia, {content: media.content});
-            if (!content) {
+            let matchNew = newMedia.filter((newM: Media ) => {
+                return newM.language === media.language;
+            });
+            // got matching language in new for old - now check content
+            console.log(`found : ${JSON.stringify(matchNew)}`);
+            if (!(matchNew.content === media.content)) {
                 return true;
             }
+
         }
         return false;
 
     }
 
-    copyVersionContent(changeContent: Content){
+    copyVersionContent($event, changeContent: Content){
 	
 	    console.log(`New content should be ${changeContent.versionMessage}`);
+        $event.preventDefault();		
 		this.content.versionMessage = changeContent.versionMessage;
-	    console.log(`New content has ${changeContent.media.length} media`);	
+	    console.log(`New content has ${changeContent.media.length} media`);
+		this.currentVersion = (changeContent.versionNo < changeContent.media.length) ? false : true;
 
-		while(this.languageTabs.length > 0) { this.languageTabs.pop(); }	
-        
+//		while(this.languageTabs.length > 0) { this.languageTabs.pop(); }	
+ 	    console.log(`2 New content should be ${changeContent.versionMessage}`);       
 		let counter = 1;
+	    console.log(`copyVersionContent - there were ${this.languageTabs.length} tabs`);				
+//		for (var oldTab of this.languageTabs)   {
+//			this.languageTabs.splice(this.languageTabs.indexOf(oldTab),1);
+//		}
+	    console.log(`copyVersionContent - there are now ${this.languageTabs.length} tabs`);		
         for (var media of changeContent.media) {
             var newMedia = new Media();
             newMedia.content = media.content;
@@ -237,60 +333,91 @@ export class ContentDetail implements OnInit {
                 counter === changeContent.media.length + 1
             ));
 
-        }		
-
+        }	
+	    console.log(`copyVersionContent - there are now ${this.languageTabs.length} tabs`);			
+	    console.log(`3 New content should be ${changeContent.versionMessage}`);
+		
     }
 
+	changeVersion(changeContent: Content){
+
+		console.log(`changeVersion - changing to version ${changeContent.versionNo}`);
+		this._router.navigate(['ContentDetail', {id: this.node._id, versionNo: changeContent.versionNo}]);		
+	
+	}
+	
     getTabForLanguage(language: Language){
-	    console.log(`getTabForLanguage - passed ${JSON.stringify(language)}`);	
-        return _.find(this.languageTabs, function(tab: ContentTab){
+	
+//	    console.log(`getTabForLanguage - passed ${JSON.stringify(language)}`);
+        return _.find(this.languageTabs, (tab: ContentTab) => {
             return tab.media.language.iso3166 == language.iso3166;
         });
 
     }
 
     refreshMedia() {
+	
         for (var media of this.content.media) {
             if (media.language.iso3166 === this.activeTab.media.language.iso3166) {
                 this.activeTab.content = media.content;
+				this.editorContent = this.activeTab.content;
             }
         }
+		console.log(`In ngOnInit - ${this.editorContent} : ${JSON.stringify(this.activeTab)}`);		
     }
 
     onTypeChanged($event) {
-        var type = _.find(this.types, function (t) {
-            return t._id === $event;
+	    console.log(`onTypeChanged ${$event}`);
+        this.node.type = _.find(this.types, (t) => {
+            console.log(`onTypeChanged : ${t}`);
+            return t === $event;
         });
-
-        this.node.type = type;
-        this.nodeEmitter.emit(this.node);
+        console.log(`onTypeChanged ${this.node.type}`);
     }
 
     onVersionMessageChanged($event) {
+	
+	    console.log(`onVersionMessageChanged ${JSON.stringify($event)}`);	
         this.content.versionMessage = $event;
+		
     }
 
     onEditorContentChanged($event) {
+	
 	    console.log(`onEditorContentChanged ${JSON.stringify($event)}`);	
         this.activeTab.media.content = $event;
+        this.getTabForLanguage(this.activeTab.language).content = this.activeTab.media.content;
+		this.content.versionMessage = '';
+
+		
     }
 
     selectTab(tab) {
-        tab.active = true;
+	
+		console.log(`In selectTab before - ${tab.title} - ${this.editorContent} : ${JSON.stringify(this.activeTab)}`);  
+		if (!tab.active) {tab.active = true;}
         this.activeTab = tab;
+		this.editorContent = this.activeTab.content;
+		console.log(`In selectTab after - ${tab.title} - ${this.editorContent} : ${JSON.stringify(this.activeTab)}`);		
+		
     }
 
     cancel($event) {
+	
         $event.preventDefault();
         this._router.navigate(['Content']);
+		
     }
 
     translate($event) {
+	
         $event.preventDefault();
+        console.log(`Translate - selectedValues is ${JSON.stringify(this.allValues)}`);
 
     }
 
-    publish($event) {
+    static publish($event) {
+	
         $event.preventDefault();
 
     }

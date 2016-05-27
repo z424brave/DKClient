@@ -1,13 +1,12 @@
+import {Injectable} from '@angular/core';
+import {tokenNotExpired, JwtHelper} from 'angular2-jwt';
+import {Observable} from '../../../node_modules/rxjs/Observable';
 import {HttpClient} from '../common/http-client';
 import {API_ENDPOINT} from '../config';
+import {User} from '../common/model/user/user';
 import {LoginUser} from './../common/model/user/login-user';
-import {Observable} from '../../../node_modules/rxjs/Observable';
 import {ApplicationError} from '../common/error';
 import {NotificationService} from '../common/service/notification-service';
-import {Injectable} from 'angular2/core';
-import {tokenNotExpired, JwtHelper} from 'angular2-jwt';
-import {User} from '../common/model/user/user';
-
 
 @Injectable()
 export class AuthService {
@@ -30,7 +29,7 @@ export class AuthService {
             this.currentUser = new User();
             this.currentUser._id = token._id;
             this.currentUser.name = token.name;
-            this.currentUser.role = token.role;
+            this.currentUser.roles = token.roles;
 			console.log(`existing token - ${this.currentUser.name}`);	
         }
 
@@ -57,7 +56,7 @@ export class AuthService {
                         this.currentUser = new User();
                         this.currentUser._id = token._id;
                         this.currentUser.name = token.name;
-                        this.currentUser.role = token.role;
+                        this.currentUser.roles = token.roles;
                         observer.next('SUCCESS');
                     },
                     err => {
@@ -79,15 +78,15 @@ export class AuthService {
         });
     }
 
-
     authorise(role: string) {
-        return tokenNotExpired() && (this.currentUser.role === 'admin' || this.currentUser.role === role);
+        return tokenNotExpired() &&
+            ( ( this.currentUser.roles.indexOf('admin') > -1 ) || ( this.currentUser.roles.indexOf(role) > -1 ) );
+//            ( ( this.currentUser.roles.filter((r: Role) => {return r.name ==='admin'}) ) || ( this.currentUser.roles.filter((r: Role) => {return r.name === role}) ) );
+        
     }
-
 
     logout() {
         localStorage.removeItem('id_token');
     }
-
 
 }

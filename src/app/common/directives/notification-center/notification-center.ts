@@ -1,14 +1,14 @@
-import {CORE_DIRECTIVES} from 'angular2/common';
-import {Component} from 'angular2/core';
-import {OnInit} from 'angular2/core';
+import {CORE_DIRECTIVES} from '@angular/common';
+import {Component} from '@angular/core';
+import {OnInit} from '@angular/core';
 import {NotificationService} from '../../service/notification-service';
-import {Alert} from 'ng2-bootstrap/ng2-bootstrap';
+import {AlertComponent} from 'ng2-bootstrap/components/alert';
 
 @Component({
     selector: 'notification-center',
     template: require('./notification-center.html'),
     styles: [require('./notification-center.css')],
-    directives: [Alert, CORE_DIRECTIVES]
+    directives: [AlertComponent, CORE_DIRECTIVES]
 })
 
 export class NotificationCenter implements OnInit {

@@ -5,7 +5,7 @@
         <label for="InputLexicon">Select a lexicon</label>
         <select class="form-control" [(ngModel)]="type"
                 (ngModelChange)="onLexiconSelectChanged($event)" id="InputLexicon">
-            <option *ngFor="#lexicon of lexicons" [value]="lexicon._id">{{lexicon.name}}</option>
+            <option *ngFor="let lexicon of lexicons" [value]="lexicon._id">{{lexicon.name}}</option>
         </select>
     </div>
     <div class="col-md-6">
@@ -45,7 +45,7 @@
         <h3>Tags</h3>
         <table class="table">
             <tbody>
-            <tr *ngFor="#tag of tags">
+            <tr *ngFor="let tag of tags | paginate: { itemsPerPage: 6, currentPage: p }" >
                 <td>
                     <update-textfield [value]="tag" (changeEmitter)="onTagUpdated($event)"></update-textfield>
                 </td>
@@ -56,4 +56,5 @@
             </tbody>
         </table>
     </div>
-</div>
+    <pagination-controls (pageChange)="p = $event" autoHide="true"></pagination-controls>
+ </div>

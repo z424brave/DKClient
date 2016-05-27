@@ -1,6 +1,6 @@
-import {Component, OnInit, EventEmitter} from 'angular2/core';
-import {ComponentInstruction, CanActivate} from 'angular2/router';
-import {FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/common';
+import {Component, OnInit} from '@angular/core';
+import {ComponentInstruction, CanActivate} from '@angular/router-deprecated';
+import {FORM_DIRECTIVES, CORE_DIRECTIVES} from '@angular/common';
 
 import {Lexicon} from './../common/model/lexicon/lexicon';
 import {Tag} from '../common/model/lexicon/tag';
@@ -9,14 +9,16 @@ import {TagService} from './../common/service/tag-service';
 import {authCheck} from '../auth/auth-check';
 import {MainMenu} from '../menu/menu-component';
 import {UpdateTextfield} from '../common/directives/update-textfield/update-textfield';
+import {PaginatePipe, PaginationControlsCmp, PaginationService} from 'ng2-pagination';
 
 let _ = require('lodash');
 
 @Component({
     template: require('./lexicon.html'),
     styles: [require('./lexicon.css'), require('../app.css')],
-    providers: [TagService, CORE_DIRECTIVES, FORM_DIRECTIVES,],
-    directives: [UpdateTextfield, MainMenu]
+    providers: [TagService, PaginationService],
+    directives: [UpdateTextfield, MainMenu, CORE_DIRECTIVES, FORM_DIRECTIVES,PaginationControlsCmp],
+    pipes: [PaginatePipe]
 })
 
 @CanActivate((next: ComponentInstruction, previous: ComponentInstruction) => {
@@ -57,7 +59,7 @@ export class LexiconComponent implements OnInit {
         this.newTag = new Tag();
     }
 
-    onLexiconSelectChanged(lexiconId) {
+    onLexiconSelectChanged(lexiconId: string) {
 	    console.log(`In onLexiconSelectChanged with ${lexiconId}`);	
         this.lexicon = _.find(this.lexicons, function (t) {
             return t._id === lexiconId;
@@ -73,7 +75,7 @@ export class LexiconComponent implements OnInit {
     }
 
     createLexicon() {
-        var that = this;
+
         if (this.newLexicon.name) {
             this._tagService.saveLexicon(this.newLexicon)
                 .subscribe(
@@ -81,9 +83,9 @@ export class LexiconComponent implements OnInit {
                         this._tagService.getLexicons()
                             .subscribe(
                                 data => {
-                                    that.lexicons = data;
-                                    that.newLexicon = new Lexicon();
-                                    that.onLexiconSelectChanged(lexicon._id);
+                                    this.lexicons = data;
+                                    this.newLexicon = new Lexicon();
+                                    this.onLexiconSelectChanged(lexicon._id);
                                 }
                             );
                     }
@@ -101,12 +103,11 @@ export class LexiconComponent implements OnInit {
     }
 
     doDeleteLexicon() {
-        var that = this;
         this._tagService.deleteLexicon(this.lexicon)
             .subscribe(
                 response => {
-                    that.cancelDelete();
-                    that.init();
+                    this.cancelDelete();
+                    this.init();
                 }
             );
     }
@@ -120,7 +121,7 @@ export class LexiconComponent implements OnInit {
         }
     }
 
-    deleteTag(tagId) {
+    deleteTag(tagId: string) {
         this._tagService.deleteTag(this.lexicon._id, tagId)
             .subscribe(res =>
                 this.onLexiconSelectChanged(this.lexicon._id)
@@ -128,11 +129,19 @@ export class LexiconComponent implements OnInit {
     }
 
     onLexiconUpdated(lexicon: Lexicon) {
-        this._tagService.updateLexicon(this.lexicon);
+	    console.log(`In onLexiconUpdated ${lexicon.name}`);		
+        this._tagService.updateLexicon(this.lexicon)
+            .subscribe(res =>
+                console.log(`onLexiconUpdated - response from update - ${JSON.stringify(res)}`)
+            );		
     }
 
     onTagUpdated(tag: Tag) {
-        this._tagService.updateTag(this.lexicon._id, tag);
+	    console.log(`In onTagUpdated ${tag.name}`);		
+        this._tagService.updateTag(this.lexicon._id, tag)
+            .subscribe(res =>
+                console.log(`onTagUpdated - response from update - ${JSON.stringify(res)}`)
+            );		
 
     }
 

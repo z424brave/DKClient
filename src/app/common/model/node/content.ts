@@ -1,5 +1,4 @@
 import {Media} from './media';
-import {Language} from '../language';
 import {BaseEntity} from '../../base-entity';
 
 export class Content extends BaseEntity {

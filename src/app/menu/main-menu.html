@@ -13,9 +13,11 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li *ngIf="user.role === 'admin'"><a [routerLink]=" ['User'] ">User</a></li>
-                    <li *ngIf="user.role === 'admin'"><a [routerLink]=" ['Lexicon'] ">Lexicon</a></li>
-                    <li><a [routerLink]=" ['Content'] ">Content</a></li>
+                    <li *ngIf="authCheck('user')"><a [routerLink]=" ['Content'] ">Content</a></li>
+                    <li *ngIf="authCheck('user')"><a [routerLink]=" ['Media'] ">Media</a></li>
+					<li *ngIf="authCheck('admin')"><a [routerLink]=" ['Channel'] ">Channel</a></li>
+					<li *ngIf="authCheck('admin')"><a [routerLink]=" ['User'] ">User</a></li>
+                    <li *ngIf="authCheck('admin')"><a [routerLink]=" ['Lexicon'] ">Lexicon</a></li>
                 </ul>
                 <div class="user-panel">
                     <div class="user-info">{{user.name}}</div>

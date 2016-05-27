@@ -1,10 +1,12 @@
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
+import {URLSearchParams} from '@angular/http';
 import {HttpClient} from '../http-client';
 import {NotificationService} from './notification-service';
 import {API_ENDPOINT} from '../../config';
 import {ApplicationError} from '../error';
 import {Observable} from 'rxjs/Observable';
 import {ContentNode} from './../model/node/content-node';
+import {SearchNode} from './../model/node/search-node';
 import {Notification} from '../directives/notification-center/notification';
 import {Content} from '../model/node/content';
 import 'rxjs/Rx';
@@ -42,7 +44,7 @@ export class ContentService {
     getUserNodes(userId: string) {
 	    console.log(`In getUserNodes - ${userId}`);
         return Observable.create(observer => {
-            this._httpClient.get(this.baseUrl.concat('user/' + userId))
+            this._httpClient.get(`${this.baseUrl}list?user=${userId}`)
                 .map((responseData) => {
 					console.log(`getUserNodes - ${JSON.stringify(responseData)}`);
                     return responseData.json();
@@ -59,8 +61,54 @@ export class ContentService {
 
         });
     };
+    static convertSearchToQuery(searchNode: SearchNode) : URLSearchParams {
 
+        let params: URLSearchParams = new URLSearchParams();
 
+        for (var property in searchNode) {
+            if (searchNode.hasOwnProperty(property)) {
+
+                console.log(`${property} : ${searchNode[property]}`);
+
+                if (searchNode[property]) {
+
+                    if (searchNode[property] instanceof Array) {
+                        if (searchNode[property].length > 0) {
+                            params.set(property, searchNode[property]);
+                        }
+                    } else {
+                        params.set(property, searchNode[property]);
+                    }
+
+                }
+            }
+        }
+
+        return params;
+    }
+
+	searchNodes(searchNode: SearchNode) {
+
+		console.log(`In searchNodes - ${JSON.stringify(searchNode)}`);
+        return Observable.create(observer => {
+            this._httpClient.getQuery(`${this.baseUrl}list`, ContentService.convertSearchToQuery(searchNode))
+                .map((responseData) => {
+					console.log(`searchNodes - ${JSON.stringify(responseData)}`);
+                    return responseData.json();
+                })
+                .subscribe(
+                    data => observer.next(data),
+                    err => this._notificationService.handleError(
+                        new ApplicationError(
+                            'Error loading nodes for search ' + searchNode.user,
+                            err)
+                    ),
+                    () => observer.complete()
+                );
+
+        });
+    };
+	
     createNode(node: ContentNode) {
         return Observable.create(observer => {
             this._httpClient.post(this.baseUrl, JSON.stringify(node))
@@ -89,7 +137,8 @@ export class ContentService {
 
     updateNode(node: ContentNode) {
         return Observable.create(observer => {
-            this._httpClient.put(this.baseUrl, JSON.stringify(node))
+			console.log(`contentService / updateNode : ${JSON.stringify(node)}`);
+            this._httpClient.put(this.baseUrl.concat(node._id), JSON.stringify(node))
                 .map((responseData) => {
                     return responseData.json();
                 })
@@ -164,6 +213,7 @@ export class ContentService {
         return Observable.create(observer => {
             this._httpClient.delete(this.baseUrl.concat(nodeId))
                 .map((responseData) => {
+					console.log(`return from delete - ${JSON.stringify(responseData)}`);
                     return responseData.json();
                 })
                 .subscribe(

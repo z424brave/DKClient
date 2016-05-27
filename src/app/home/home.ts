@@ -1,8 +1,6 @@
-import {Component} from 'angular2/core';
-//import {FORM_DIRECTIVES} from 'angular2/common';
-//import {Http} from 'angular2/http';
-//import {tokenNotExpired} from 'angular2-jwt';
-import {ComponentInstruction, CanActivate} from 'angular2/router';
+import {Component} from '@angular/core';
+import {ComponentInstruction, CanActivate} from '@angular/router-deprecated';
+
 import {authCheck} from '../auth/auth-check';
 import {MainMenu} from '../menu/menu-component';
 
@@ -18,6 +16,7 @@ import {MainMenu} from '../menu/menu-component';
 })
 
 @CanActivate((next: ComponentInstruction, previous: ComponentInstruction) => {
+    console.log(`In home`);
     return authCheck('user', next, previous);
 })
 export class Home {

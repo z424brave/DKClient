@@ -1,6 +1,5 @@
-import {Component} from 'angular2/core';
-import {ROUTER_DIRECTIVES, Router, ComponentInstruction, RouteConfig, CanActivate} from 'angular2/router';
-import {tokenNotExpired} from 'angular2-jwt';
+import {Component} from '@angular/core';
+import {ROUTER_DIRECTIVES, Router, ComponentInstruction, RouteConfig, CanActivate} from '@angular/router-deprecated';
 
 import {UserService} from './../common/service/user-service';
 import {UserList} from './list/user-list';
@@ -24,9 +23,5 @@ import {authCheck} from '../auth/auth-check';
 })
 
 export class UserComponent {
-
-    constructor(private _router: Router){
-
-    }
 
 }

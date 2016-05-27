@@ -1,23 +1,24 @@
-import {Component, EventEmitter} from 'angular2/core';
-import {Router} from 'angular2/router';
+import {Component, Input, OnInit} from '@angular/core';
+import {FORM_DIRECTIVES} from '@angular/common';
+import {Router} from '@angular/router-deprecated';
 import {User} from '../../common/model/user/user';
-import {AuthService} from '../../auth/auth-service';
 import {ContentNode} from './../../common/model/node/content-node';
+import {SearchNode} from './../../common/model/node/search-node';
 import {MainMenu} from '../../menu/menu-component';
-import {OnInit} from 'angular2/core';
-import {ContentDetail} from './../detail/content-detail';
-import {ContentService} from './../../common/service/content-service';
-import {IsoDatePipe} from '../../common/iso-date-pipe';
-import {TagSelect} from '../../common/directives/tag-select/tag-select';
+import {AuthService} from '../../auth/auth-service';
 import {UserService} from '../../common/service/user-service';
 import {TagService} from './../../common/service/tag-service';
-import {SearchNode} from './../../common/model/node/search-node';
+import {ContentService} from './../../common/service/content-service';
+import {IsoDatePipe} from '../../common/iso-date-pipe';
+import {UpdateFromSelectValue} from '../../common/model/update-from-select-value';
+import {UpdateFromSelect} from '../../common/directives/update-from-select/update-from-select';
+import {Tag} from "../../common/model/lexicon/tag";
 
 let _ = require('lodash');
 
 @Component({
-    selector: 'node-list',
-    directives: [ContentDetail, MainMenu, TagSelect],
+    selector: "node-list",
+    directives: [MainMenu, UpdateFromSelect, FORM_DIRECTIVES],
     pipes: [IsoDatePipe],
     template: require('./content-list.html'),
     styles: [require('./content-list.css'), require('../../app.css')],
@@ -32,82 +33,153 @@ export class ContentList implements OnInit {
                 private _tagService: TagService,
                 private _authService: AuthService) {
 
-        this.nodeEmitter = new EventEmitter();
         this.searchNode =  new SearchNode();
+		
     }
 
-    nodes = [];
-    searchNode: SearchNode;
-    nodeEmitter: EventEmitter<ContentNode>;
-    //Search form select values
-    statuses = ['active', 'deleted'];
-    types = ['text','html'];
-    users = [];
+    @Input() searchNode: SearchNode;
+
+    allValues: Array<UpdateFromSelectValue> = [];
+    nodes: Array<ContentNode> = [];
+    statuses = ['','active', 'deleted'];
+    types = ['','text','html','image'];
+    users: Array<User> = [];
     currentUser: User;
 
-    getUserNodes() {
+    public deleteNode($event, nodeId) {
 
-	console.log(`in getUserNodes for ${this._authService.currentUser._id}`);
-        this._contentService.getUserNodes(this._authService.currentUser._id)
+		console.log(`in deleteNode for ${nodeId}`);	
+        $event.preventDefault();
+        this._contentService.deleteNode(nodeId)
+            .subscribe(
+                this._getUserNodes(this.currentUser._id)
+            );
+			
+    }
+
+    public restoreNode($event, node) {
+
+		console.log(`in restoreNode for ${JSON.stringify(node)} : ${JSON.stringify(this.searchNode.user)}`);	
+        $event.preventDefault();
+		node.status = 'active';
+        this._contentService.updateNode(node)
+            .subscribe(
+                this._getUserNodes(this.currentUser._id)
+            );
+			
+    }	
+	
+    public onSelect(node: ContentNode) {
+    
+		let latestVersion = node.content[node.content.length - 1].versionNo;
+		this._router.navigate(['ContentDetail', {id: node._id, versionNo: latestVersion}]);
+    
+	}
+
+    public newContent() {
+		
+		console.log("In newContent");	
+        this._router.navigate(['ContentDetail', {id: "", versionNo: 1}]);
+    
+	}
+
+	public search() {
+
+		this.searchNode.tags = this.allValues.filter((value) => {
+
+            return value.selected;
+
+        }).map((selectedValue) => {
+            return selectedValue.key;
+        });
+        
+		console.log(`Search params are : ${JSON.stringify(this.searchNode)}`);
+        this._contentService.searchNodes(this.searchNode)
             .subscribe(
                 data => {
                     this.nodes = data;
+					console.log(`in content-list / getUserNodes : ${JSON.stringify(this.nodes)}`);					
                     this.currentUser = this._authService.currentUser;
                 }
             );
 
 	}
 
-    getUserList() {
+	public reset($event) {
 
+		$event.preventDefault();
+        this._getAllTags();
+		this._setDefaultSearchTerms();
+
+	}
+	
+    public ngOnInit() {
+
+		console.log(`In content-list / ngOnInit`);
+        this._getAllTags();
+		this._getUserList();
+		this._setDefaultSearchTerms();
+//        this._getUserNodes(this.searchNode.user);
+        this.search();
+	}
+
+    private _getUserNodes(userId: string) {
+
+        console.log(`in content-list / getUserNodes for ${userId}`);
+        this._contentService.getUserNodes(userId)
+            .subscribe(
+                data => {
+                    this.nodes = data;
+                    console.log(`in content-list / getUserNodes : ${JSON.stringify(this.nodes)}`);
+                    this.currentUser = this._authService.currentUser;
+                }
+            );
+
+    }
+
+    private _getUserList() {
+
+        console.log(`in getUserList`);
         this._userService.getUsers()
             .subscribe(
                 data => {
                     this.users = data;
-				}
+                    let user = new User();
+                    user.name = '';
+                    user._id = '';
+                    this.users.unshift(user);
+                    console.log(`Users are : ${JSON.stringify(this.users)}`);
+                }
             );
-			
+
     }
 
-    //TODO isolate this handler for reuse
-    onTypeChanged($event) {
-		console.log("In onTypeChanged");	
-        var type = _.find(this.types, function (t) {
-            return t._id === $event;
-        });
-        this.searchNode.tags = [];
-        this.searchNode.type = type;
-        this.nodeEmitter.emit(this.searchNode);
+    private _getAllTags() {
+
+        console.log(`in content-list / getAllTags`);
+        this._tagService.getLexicons().subscribe(
+            data => {
+
+                let tags = _.flatMap(_.map(data, 'tags'));
+                this.allValues = tags.map((tag: Tag) => {
+                    return new UpdateFromSelectValue(tag._id, tag.name);
+                });
+
+                console.log(`in getAllTags - Tags : ${this.allValues.length} - ${JSON.stringify(this.allValues)}`);
+
+            }
+        );
+
     }
 
-    deleteNode($event, nodeId) {
-        $event.preventDefault();
-        this._contentService.deleteNode(nodeId)
-            .subscribe(
-                this.getUserNodes()
-            );
-    }
+	private _setDefaultSearchTerms() {
 
-    onSelect(node: ContentNode) {
-        this._router.navigate(['ContentDetail', {id: node._id}]);
-    }
-
-    newContent() {
-		console.log("In newContent");	
-        this._router.navigate(['ContentDetail', {id: undefined}]);
-    }
-
-	search() {
-		console.log("Search clicked");
-	}
-
-	reset() {
-		console.log("Reset clicked");
-	}
+		this.searchNode.user = this._authService.currentUser._id;
+		this.searchNode.type = "";
+		this.searchNode.status = "active";
+		this.searchNode.contains = "";
+		this.searchNode.tags = [];	
 	
-    ngOnInit() {
-        this.getUserNodes();
-        this.getUserList();
-    }
+	}
 
 }

@@ -1,8 +1,7 @@
-import {Component} from 'angular2/core';
-import {Router,RouterLink, ROUTER_DIRECTIVES} from 'angular2/router';
+import {Component} from '@angular/core';
+import {Router, ROUTER_DIRECTIVES} from '@angular/router-deprecated';
 import {AuthService} from '../auth/auth-service';
 import {User} from '../common/model/user/user';
-
 
 @Component({
     selector: 'main-menu',
@@ -11,7 +10,6 @@ import {User} from '../common/model/user/user';
     directives: [...ROUTER_DIRECTIVES],
     providers: [AuthService]
 })
-
 
 export class MainMenu {
 
@@ -27,5 +25,8 @@ export class MainMenu {
         this._router.navigate(['/Login']);
     }
 
+    authCheck(roleRequired) : boolean {
+        return this.user.roles.indexOf(roleRequired) > -1 ;
+    }
 
 }

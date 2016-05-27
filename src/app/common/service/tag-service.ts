@@ -1,30 +1,57 @@
-import {Injectable} from 'angular2/core';
-import {Http, Headers} from 'angular2/http';
-import {EventEmitter} from 'angular2/core';
+import {Injectable} from '@angular/core';
+import {Http, Headers} from '@angular/http';
 import {HttpClient} from '../../common/http-client';
 import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
 import {Notification} from '../directives/notification-center/notification';
 import {ApplicationError} from '../../common/error';
 import {API_ENDPOINT} from '../../config';
 import {NotificationService} from './notification-service';
 import {Tag} from '../model/lexicon/tag';
-import {LegacyHtmlParser} from 'angular2/src/compiler/legacy_template';
 import {Lexicon} from '../model/lexicon/lexicon';
 
 @Injectable()
 export class TagService {
 
     private baseUrl: string;
+	private _selectedTags: Array<string> ;
 
     constructor(private _httpClient: HttpClient,
-                private _notificationService: NotificationService) {
+				private _notificationService: NotificationService) {
+				
         this.baseUrl = API_ENDPOINT.concat('/lexicons/');
+		this._selectedTags = [];
+		console.log(`In tag-service - selected tags set to size ${this._selectedTags.length}`);
+		
     }
 
-    getLexicons() {
+	getSelectedTags() : Array<string> {
+	
+		return this._selectedTags; 
+		
+	}
+ 
+	removeSelectedTag(tag: Tag) : void {
+
+		if(this._selectedTags.indexOf(tag.name) != -1){
+			this._selectedTags.splice(this._selectedTags.indexOf(tag.name), 1);
+		}
+	    console.log(`In removeSelectedTag - ${tag.name} - there are now ${this._selectedTags.length} selected tags`);			
+
+	}
+
+	addSelectedTag(tag: Tag) : void {
+	
+		this._selectedTags.push(tag.name); 
+	    console.log(`In addSelectedTag - ${tag.name} - there are now ${this._selectedTags.length} selected tags`);	
+		
+	}
+	
+	getLexicons() {
+        console.log(`In getLexicons`);
         var that = this;
         return Observable.create(observer => {
-            this._httpClient.get(this.baseUrl)
+            this._httpClient.get(`${this.baseUrl}list`)
                 .map((responseData) => {
 				    console.log(`Lexicons : ${JSON.stringify(responseData)}`);
                     return responseData.json();
@@ -67,10 +94,11 @@ export class TagService {
 
     updateTag(lexiconId: string, tag: Tag) {
         var that = this;
-        console.log('update : ' + tag);
+        console.log('update : ' + tag.name);
         return Observable.create(observer => {
                 this._httpClient.put(this.baseUrl.concat(lexiconId).concat('/tags'), JSON.stringify(tag))
                     .map((responseData) => {
+						console.log(`update : ${tag.name} ${responseData.json()}`);					
                         return responseData.json();
                     })
                     .subscribe(
@@ -122,7 +150,7 @@ export class TagService {
     updateLexicon(lexicon: Lexicon) {
         var that = this;
         return Observable.create(observer => {
-                this._httpClient.put(this.baseUrl, JSON.stringify(lexicon))
+                this._httpClient.put(this.baseUrl.concat(lexicon._id), JSON.stringify(lexicon))
                     .map((responseData) => {
                         return responseData.json();
                     })

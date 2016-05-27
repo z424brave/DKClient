@@ -1,5 +1,5 @@
-import {Injectable} from 'angular2/core';
-import {Http, Headers} from 'angular2/http';
+import {Injectable} from '@angular/core';
+import {Http, Headers} from '@angular/http';
 import {AuthHttp} from 'angular2-jwt';
 
 
@@ -14,13 +14,19 @@ export class HttpClient {
 
     //TODO add interceptor: if 401/403 => logout
 
+    getQuery(url, searchParams) {
+        let headers = new Headers();
+        return this._authHttp.get(url, {
+            headers: headers,
+            search: searchParams
+        });
+    }
     get(url) {
         let headers = new Headers();
         return this._authHttp.get(url, {
             headers: headers
         });
     }
-
     post(url, data) {
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');

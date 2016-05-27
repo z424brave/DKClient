@@ -12,3 +12,9 @@ tab {
 content-editor {
     overflow: hidden;
 }
+
+.content-image {
+    width: 300px;
+    height: 200px;
+    margin-left: 50px;
+}

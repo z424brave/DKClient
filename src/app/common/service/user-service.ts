@@ -1,7 +1,5 @@
-import {Injectable} from 'angular2/core';
-import {Http, Headers} from 'angular2/http';
+import {Injectable} from '@angular/core';
 import {User} from './../model/user/user';
-import {EventEmitter} from 'angular2/core';
 import {HttpClient} from '../http-client';
 import {Observable} from 'rxjs/Observable';
 import {NotificationService} from './notification-service';
@@ -21,7 +19,7 @@ export class UserService {
 
     getUsers() {
         return Observable.create(observer => {
-            this._httpClient.get(this.baseUrl)
+            this._httpClient.get(this.baseUrl.concat('list'))
                 .map((responseData) => {
                     return responseData.json();
                 })
@@ -40,7 +38,7 @@ export class UserService {
 
     getUser(id: string) {
         return Observable.create(observer => {
-            this._httpClient.get(this.baseUrl + id)
+            this._httpClient.get(this.baseUrl.concat(id))
                 .map((responseData) => {
                     return responseData.json();
                 })
@@ -67,7 +65,7 @@ export class UserService {
                     });
 
             } else {
-                response = this._httpClient.put(this.baseUrl, JSON.stringify(user))
+                response = this._httpClient.put(this.baseUrl.concat(user._id), JSON.stringify(user))
                     .map((responseData) => {
                         return responseData.json();
                     });

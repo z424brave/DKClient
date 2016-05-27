@@ -1,7 +1,9 @@
-import {provide} from 'angular2/core';
-import {bootstrap, ELEMENT_PROBE_PROVIDERS} from 'angular2/platform/browser';
-import {ROUTER_PROVIDERS, LocationStrategy, PathLocationStrategy} from 'angular2/router';
-import {Http, HTTP_PROVIDERS} from 'angular2/http';
+import {provide} from '@angular/core';
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {ELEMENT_PROBE_PROVIDERS} from '@angular/platform-browser';
+import {ROUTER_PROVIDERS} from '@angular/router-deprecated';
+import {Http, HTTP_PROVIDERS} from '@angular/http';
+import {FORM_PROVIDERS} from '@angular/common';
 import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import {appInjector} from './app/common/app-injector';
 import {AuthService} from './app/auth/auth-service';
@@ -9,7 +11,6 @@ import {AuthService} from './app/auth/auth-service';
 import {App} from './app/app';
 import {HttpClient} from './app/common/http-client';
 import {NotificationService} from './app/common/service/notification-service';
-
 
 document.addEventListener('DOMContentLoaded', function main() {
 	console.log(`Running app in ${process.env.NODE_ENV} pointing at ${process.env.API}`);
@@ -19,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function main() {
         NotificationService,
         ...('production' === process.env.ENV ? [] : ELEMENT_PROBE_PROVIDERS),
         ...HTTP_PROVIDERS,
-        ...ROUTER_PROVIDERS,
-        provide(LocationStrategy, {useClass: PathLocationStrategy}),
+        ROUTER_PROVIDERS,
+        ...FORM_PROVIDERS,
         provide(AuthHttp, {
             useFactory: (http) => {
                 return new AuthHttp(new AuthConfig(), http);
