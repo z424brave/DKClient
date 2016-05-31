@@ -34,7 +34,7 @@ export class FileUpload {
     public fileOverBase(e:any):void {
         this.hasBaseDropZoneOver = e;
     };
-    private _fileName: string = '';
+
     public handleSuccess(item: FileItem, response: any, status: any, headers: Headers): any {
 
         console.log(`success for ${item.file.name}`);

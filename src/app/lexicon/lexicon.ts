@@ -61,7 +61,7 @@ export class LexiconComponent implements OnInit {
 
     onLexiconSelectChanged(lexiconId: string) {
 	    console.log(`In onLexiconSelectChanged with ${lexiconId}`);	
-        this.lexicon = _.find(this.lexicons, function (t) {
+        this.lexicon = _.find(this.lexicons, (t) => {
             return t._id === lexiconId;
         });
 
@@ -105,7 +105,7 @@ export class LexiconComponent implements OnInit {
     doDeleteLexicon() {
         this._tagService.deleteLexicon(this.lexicon)
             .subscribe(
-                response => {
+                () => {
                     this.cancelDelete();
                     this.init();
                 }

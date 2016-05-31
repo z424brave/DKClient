@@ -8,17 +8,6 @@
     margin: 0;
     text-align: center;
 }
-.new-media {
-    height: 50px;
-}
-
-.new-media-btn {
-    float: right;
-}
-
-.new-folder-btn {
-    float: left;
-}
 .box {
     float: left;
     position: relative;

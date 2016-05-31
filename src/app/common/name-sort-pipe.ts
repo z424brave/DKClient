@@ -7,9 +7,8 @@ let _ = require('lodash');
 
 export class NameSort implements PipeTransform {
     transform(users: Array<User>): Array<User> {
-        return _.sortBy(users, function (user) {
+        return _.sortBy(users, (user) => {
             return user.name;
         });
-
     }
 }

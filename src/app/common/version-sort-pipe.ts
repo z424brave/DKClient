@@ -7,9 +7,8 @@ let _ = require('lodash');
 
 export class VersionSort implements PipeTransform {
     transform(contentNodes: Array<Content>): Array<Content> {
-        return _.sortBy(contentNodes, function (content) {
+        return _.sortBy(contentNodes, (content) => {
             return -content.versionNo;
         });
-
     }
 }
