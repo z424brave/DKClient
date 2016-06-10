@@ -1,8 +1,9 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {Subscription} from 'rxjs/Subscription';
 import {TreeNode} from '../../model/tree-node';
 import {TreeNodeService} from "../../service/tree-node-service";
 import {PaginatePipe, PaginationControlsCmp, PaginationService} from 'ng2-pagination';
+import {EXTERNAL_URL_PREFIX} from '../../../config';
 
 @Component({
   template: require('./leaf-view.html'),
@@ -16,33 +17,23 @@ import {PaginatePipe, PaginationControlsCmp, PaginationService} from 'ng2-pagina
 
 export class LeafView implements OnInit, OnDestroy{
 
-  leafs: Array<TreeNode>;
+  @Input() urlPrefix: string = EXTERNAL_URL_PREFIX ;
+  leafs: Array<TreeNode> = [];
   subscription: Subscription;
-  leafsPerPage: number = 9;  
+  leafsPerPage: number = 6;
 
   constructor(private _treeNodeService: TreeNodeService){
-    this.subscription = _treeNodeService.showLeafNodesChanges.subscribe(
-        leafs => {
-          console.log(`Received leafs - ${leafs.length}`);
-          this.leafs = leafs;
-        })
+
   }
 
   ngOnInit(){
     console.log(`In OnInit - LeafView`);
     this.subscription = this._treeNodeService.showLeafNodesChanges.subscribe(
         leafs => {
-          console.log(`Received leafs - ${leafs.length}`);
+          console.log(`Received leafs count - ${leafs.length}}`);
+          console.log(`Received leafs data  - ${JSON.stringify(leafs)}`);
           this.leafs = leafs;
         })
-  }
-
-  newMedia(val) {
-        console.log(`In newMedia - ${val}`);
-  }
-
-  newFolder(val) {
-        console.log(`In newFolder - ${val}`);
   }
 
   ngOnDestroy(){

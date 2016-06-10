@@ -5,7 +5,7 @@ export class User extends BaseEntity {
     name: string;
     email: string;
     password: string;
-    roles: [string];
+    roles: string[];
     status: string;
     lastLogin: string;
 

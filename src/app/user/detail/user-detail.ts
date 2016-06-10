@@ -71,6 +71,16 @@ export class UserDetail implements OnInit {
         });
     }
 
+    private _saveRolesToUser() {
+        return this.allValues.filter((value) => {
+
+            return value.selected;
+
+        }).map((selectedValue) => {
+            return selectedValue.name;
+        });
+    }
+
     private _initForm() {
         console.log('initiating form: ' + JSON.stringify(this.user));
         this.userForm = this._formBuilder.group({
@@ -104,6 +114,7 @@ export class UserDetail implements OnInit {
         this.submitted = true;
 		console.log(`in submitUser - ${this.userForm.valid}`);
         if (this.userForm.valid) {
+            this.user.roles = this._saveRolesToUser();
             this._userService.saveUser(this.user).subscribe(
                 data => {
                      this.user =  data;

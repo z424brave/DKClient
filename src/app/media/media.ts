@@ -6,6 +6,9 @@ import {TreeNode} from '../common/model/tree-node';
 import {TreeNodeService} from '../common/service/tree-node-service';
 import {authCheck} from '../auth/auth-check';
 import {MainMenu} from '../menu/menu-component';
+import {Observable} from 'rxjs/Observable';
+import {Subscription} from 'rxjs/Subscription';
+import {S3Service} from '../common/service/s3Service';
 
 @Component({
     template: require('./media.html'),
@@ -13,6 +16,7 @@ import {MainMenu} from '../menu/menu-component';
     directives:[TreeView, LeafView, MainMenu],
     providers:[TreeNodeService]
 })
+
 @CanActivate((next: ComponentInstruction, previous: ComponentInstruction) => {
     return authCheck('admin', next, previous);
 })
@@ -21,9 +25,22 @@ export class MediaComponent implements OnInit {
 
     node: TreeNode = null;
     leafs: Array<TreeNode> = null;
+    newFolder: string = '';
+    currentFolder: string;
+    nodeChange: Subscription;
+
+    constructor(private _treeNodeService: TreeNodeService,
+                private _s3Service: S3Service){
+
+    }
 
     ngOnInit(){
         this.node = new TreeNode('root','/', '');
+        this.nodeChange = this._treeNodeService.showNodeChange.subscribe(
+            node => {
+                this.currentFolder = node;
+                console.log(`Node Change to - ${this.currentFolder}`);
+            })
     }
 
     displayLeafsForNode(leafs) {
@@ -32,6 +49,21 @@ export class MediaComponent implements OnInit {
     }
     selectNode(node) {
         console.log(`Node selected is - ${JSON.stringify(node)}`);
+    }
+
+    addFolder(val) {
+        let newFolderName: string = this.currentFolder.concat(val);
+        console.log(`In addFolder - ${newFolderName}`);
+//        Observable.create(observer => {
+            console.log(`In addFolder 2 - ${newFolderName}`);
+            this._s3Service.createFolder(newFolderName)
+                .subscribe(res => {
+                    console.log(`after call to s3 createFolder - ${JSON.stringify(res)}`);
+                    this.newFolder = '';
+//                    observer.next();
+                });
+//        });
+
     }
 
 }

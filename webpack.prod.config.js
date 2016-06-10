@@ -184,13 +184,13 @@ module.exports = helpers.validate({
     resourcePath: 'src',
   },
 
-  htmlLoader: {
+ /* htmlLoader: {
     minimize: true,
     removeAttributeQuotes: false,
     caseSensitive: true,
-    customAttrSurround: [ [/#/, /(?:)/], [/\*/, /(?:)/], [/\[?\(?/, /(?:)/] ],
+    customAttrSurround: [ [/#/, /(?:)/], [/\*!/, /(?:)/], [/\[?\(?/, /(?:)/] ],
     customAttrAssign: [ /\)?\]?=/ ]
-  },
+  },*/
   // don't use devServer for production
 
   // we need this due to problems with es6-shim

@@ -13,9 +13,11 @@ export class TreeNodeService {
     private _defaultPrefix: string = "/";
 
     private _showLeafNodes = new Subject<Array<TreeNode>>();
+    private _showCurrentNode = new Subject<string>();    
 
     showLeafNodesChanges = this._showLeafNodes.asObservable();
-
+    showNodeChange       = this._showCurrentNode.asObservable();
+    
     constructor(private _s3Service:S3Service) {
 
     }
@@ -34,7 +36,7 @@ export class TreeNodeService {
         });
     }
 
-    convertS3ToNodes(data) {
+    convertS3ToNodes(data: any) {
         let prefix: string = this._defaultPrefix.concat(data.Prefix);
         this._leafNodes[prefix] = data.Contents.filter(n => {
             return (!(n.Key === data.Prefix))
@@ -53,11 +55,14 @@ export class TreeNodeService {
     }
 
     displayLeafNodes(key: string) {
+        console.log(`in getLeafNodes - ${key}`);
         this._showLeafNodes.next(this.getLeafNodes(key));
+        this._showCurrentNode.next(key);
     }
 
     getLeafNodes(key) : Array<TreeNode> {
         console.log(`in getLeafNodes - ${key} : ${this._defaultPrefix.concat(key)} : leafs : ${this._leafNodes[this._defaultPrefix.concat(key)]}`);
         return this._leafNodes[this._defaultPrefix.concat(key)] ? this._leafNodes[this._defaultPrefix.concat(key)] : [];
     }
+
 }

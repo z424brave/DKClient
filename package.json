@@ -21,6 +21,7 @@
     "build:dev": "webpack --progress --profile --colors --display-error-details --display-cached",
     "prebuild:prod": "npm run clean:dist",
     "build:prod": "webpack --config webpack.prod.config.js --progress --profile --colors --display-error-details --display-cached  --bail",
+    "build:staging": "webpack --config webpack.staging.config.js --progress --profile --colors --display-error-details --display-cached  --bail",
     "server": "npm run server:dev:hmr",
     "server:dev": "webpack-dev-server --inline --progress --profile --colors --watch --display-error-details --display-cached  --content-base src/",
     "server:dev:hmr": "npm run server:dev -- --hot",
@@ -63,14 +64,15 @@
     "zone.js": "^0.6.12"
   },
   "devDependencies": {
-    "compression-webpack-plugin": "^0.3.0",
-    "copy-webpack-plugin": "^1.1.1",
+    "awesome-typescript-loader": "~0.17.0",
+    "compression-webpack-plugin": "^0.3.1",
+    "copy-webpack-plugin": "^3.0.0",
     "css-loader": "^0.23.1",
     "es6-promise-loader": "^1.0.1",
     "exports-loader": "^0.6.3",
     "expose-loader": "^0.7.1",
     "file-loader": "^0.8.5",
-    "html-webpack-plugin": "^2.9.0",
+    "html-webpack-plugin": "^2.17.0",
     "http-server": "^0.9.0",
     "ie-shim": "^0.1.0",
     "imports-loader": "^0.6.5",
@@ -107,6 +109,7 @@
     "webpack-dev-server": "^1.14.1",
     "webpack-load-plugins": "^0.1.2",
     "webpack-md5-hash": "^0.0.5",
+    "webpack-merge": "^0.13.0",
     "webpack-validator": "^1.0.0-beta.4"
   },
   "repository": {

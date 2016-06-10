@@ -5,11 +5,17 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="form-group">
-                <label for="InputcontentTitle">Title</label>
+            <div *ngIf="currentVersion" class="form-group">
+                <label for="InputContentTitle">Title</label>
                 <input type="text" [(ngModel)]="node.name" ngControl="name"
-                       class="form-control" id="InputcontentTitle"
+                       class="form-control" id="InputContentTitle"
                        placeholder="Title" required>
+            </div>
+            <div *ngIf="!currentVersion" class="form-group">
+                <label for="InputContentTitle2">Title</label>
+                <input type="text" [(ngModel)]="node.name" ngControl="name"
+                       class="form-control" id="InputContentTitle2"
+                       placeholder="Title" readonly>
             </div>
         </div>
     </div>
@@ -38,7 +44,7 @@
         </div>
     </div>
 
-    <div class="form-group">
+    <div *ngIf="currentVersion" class="form-group">
         <label for="InputVersionMessage">Version message</label>
         <input type="text"
                [(ngModel)]="content.versionMessage"
@@ -46,8 +52,15 @@
                class="form-control" id="InputVersionMessage"
                placeholder="Version message" required>
     </div>
-
-    <div class="row" *ngIf="node.type==='text'">
+    <div *ngIf="!currentVersion" class="form-group">
+        <label for="InputVersionMessage2">Version message</label>
+        <input type="text"
+               [(ngModel)]="content.versionMessage"
+               ngControl="content.versionMessage"
+               class="form-control" id="InputVersionMessage2"
+               placeholder="Version message" readonly>
+    </div>
+    <div class="row" *ngIf="(node.type==='text' || node.type==='html')">
         <div class="col-md-8">
             <tabset>
                 <tab *ngFor="let languageTab of languageTabs"
@@ -56,11 +69,8 @@
                      (deselect)="languageTab.active = false"
                      (select)="selectTab(languageTab)"
                      [disabled]="languageTab.disabled">
-                    <inline-editor *ngIf="currentVersion" [(ngModel)]="editorContent" (change)="editorContentChanged($event)" [config]="{uiColor: '#99000',filebrowserBrowseUrl: 'http://localhost:3000/media'}">
+                    <inline-editor [(ngModel)]="editorContent" (change)="editorContentChanged($event)" [config]="{uiColor: '#99000',readOnly: !currentVersion}">
                     </inline-editor>
-                    <div [hidden]="currentVersion">
-                        {{editorContent}}
-                    </div>
                 </tab>
 			</tabset>
 		</div>
@@ -76,23 +86,22 @@
             </ul>
         </div>
     </div>
-    <div class="row" *ngIf="node.type==='html'">
-        <div class="col-md-8">
-            <tabset>
-                <tab *ngFor="let languageTab of languageTabs"
-                     [heading]="languageTab.title"
-                     [active]="languageTab.active"
-                     (deselect)="languageTab.active = false"
-                     (select)="selectTab(languageTab)"
-                     [disabled]="languageTab.disabled">
-                    <inline-editor *ngIf="currentVersion" [(ngModel)]="editorContent" (change)="editorContentChanged($event)" [config]="{uiColor: '#99000',filebrowserBrowseUrl: 'http://localhost:3000/media'}">
-                    </inline-editor>
-                    <div [hidden]="currentVersion">
-                        {{editorContent}}
-                    </div>
-                </tab>
-            </tabset>
-        </div>
+    <div class="row" *ngIf="(node.type==='image')">
+            <div class="col-md-8">
+                <tabset>
+                    <tab *ngFor="let languageTab of languageTabs"
+                         [heading]="languageTab.title"
+                         [active]="languageTab.active"
+                         (deselect)="languageTab.active = false"
+                         (select)="selectTab(languageTab)"
+                         [disabled]="languageTab.disabled">
+                        <img *ngIf="languageTab.content" class="content-image" src="{{ urlPrefix + 'Warhammer/' + languageTab.content }}"/>
+                        <div *ngIf="!languageTab.content" class="row">
+                            <file-upload (onUploaded)="onUploaded($event)"></file-upload>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
         <div *ngIf="!isNewNode" class="col-md-4">
             <h3>History</h3>
             <ul class="fa-ul">
@@ -105,18 +114,11 @@
             </ul>
         </div>
     </div>
-    <div class="row" *ngIf="(node.type==='image')">
-        <div *ngIf="!isNewNode">
-            <img class="content-image" src="{{ 'https://d2mgfhkgxmsoab.cloudfront.net/' + editorContent }}"/>
-        </div>
-        <div *ngIf="isNewNode">
-            <file-upload></file-upload>
-        </div>
-    </div>
-    <div *ngIf="currentVersion" class="form-buttons">
-        <button type="submit" class="btn btn-success">{{saveAction}}</button>
-        <button class="btn btn-default" (click)="translate($event)">Translate</button>
-        <button class="btn btn-default" (click)="publish($event)">Publish</button>
+    <div class="form-buttons">
+        <button *ngIf="currentVersion" type="submit" class="btn btn-success">{{saveAction}}</button>
+        <button *ngIf="(( currentVersion && node.content[0]) && (!node.content[0].translated && !node.content[0].sentForTranslation))"
+                class="btn btn-default" (click)="translate($event)">Translate</button>
+        <button *ngIf="currentVersion" class="btn btn-default" (click)="publish($event)">Publish</button>
         <button class="btn btn-default" (click)="cancel($event)">Cancel</button>
     </div>
 

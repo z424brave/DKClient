@@ -1,9 +1,9 @@
 <div class="wrap">
     <div *ngFor="let leaf of leafs | paginate: { itemsPerPage: leafsPerPage, currentPage: p }" class="box">
         <div class="boxInner" >
-            <img src="{{ 'https://d2mgfhkgxmsoab.cloudfront.net/' + leaf.key }}"/>
+            <img src="{{ urlPrefix + leaf.key }}"/>
             <div class="titleBox">{{ leaf.name }}</div>
         </div>
     </div>
 </div>
-<pagination-controls (pageChange)="p = $event" autoHide="true"></pagination-controls>
+<pagination-controls *ngIf="leafs.length" (pageChange)="p = $event" autoHide="true"></pagination-controls>

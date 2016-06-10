@@ -56,7 +56,7 @@ export class Store{
   }
 
   getLeafNodes(key){
-        console.log(`in getLeafNodes : ${key}`);
+        console.log(`in getLeafNodes (store) : ${key}`);
         if(!this.treeNodes.hasOwnProperty(key)){
             this.treeNodes[key] = new Subject<Array<TreeNode>>();
         }

@@ -3,8 +3,11 @@
 <div class="new-media">
     <div class="col-md-4"></div>
     <div class="col-md-8">
-        <input class="new-folder-btn btn btn-success" type="submit" value="Add Folder" (click)="newFolder()">
-        <input class="new-media-btn btn btn-success" type="submit" value="Add Media" (click)="newMedia()">
+        <label>&nbsp;</label>
+        <div class="form-inline">
+            <input type="text" [(ngModel)]="newFolder" class="form-control text-input">
+            <button type="submit" class="btn btn-success" (click)="addFolder(newFolder)">Add Folder</button>
+        </div>
     </div>
 </div>
     <div class="row">

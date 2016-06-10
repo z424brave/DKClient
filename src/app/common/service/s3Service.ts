@@ -12,7 +12,7 @@ export class S3Service {
 
     constructor(private _httpClient: HttpClient,
                 private _notificationService: NotificationService) {
-        this.baseUrl = API_ENDPOINT.concat('/s3/');
+        this.baseUrl = API_ENDPOINT.concat('/s3');
     }
 
     list(s3Prefix: string) {
@@ -30,6 +30,27 @@ export class S3Service {
                     err => this._notificationService.handleError(
                         new ApplicationError(
                             'Error loading from S3',
+                            err)
+                    ),
+                    () => observer.complete()
+                );
+
+        });
+    };
+
+    createFolder(newFolder: string) {
+        console.log(`In s3 / createFolder - ${newFolder}`);
+        return Observable.create(observer => {
+            this._httpClient.put(`${this.baseUrl}?dirName=${newFolder}`,'')
+                .map((responseData) => {
+                    console.log(`In s3 / createFolder - ${newFolder} - after put ${JSON.stringify(responseData.json())}`);
+                    return responseData.json();
+                })
+                .subscribe(
+                    data => observer.next(data),
+                    err => this._notificationService.handleError(
+                        new ApplicationError(
+                            'Error updating S3',
                             err)
                     ),
                     () => observer.complete()

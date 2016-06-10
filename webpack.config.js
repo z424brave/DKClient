@@ -4,6 +4,7 @@ var webpack = require('webpack');
 var helpers = require('./helpers');
 
 var CopyWebpackPlugin = require('copy-webpack-plugin');
+const DefinePlugin = require('webpack/lib/DefinePlugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var ENV = process.env.ENV = process.env.NODE_ENV = 'development';
@@ -15,6 +16,7 @@ var metadata = {
   host: 'localhost',
   port: 3000,
   API: 'http://localhost:3001',
+  EXTERNAL_URL_PREFIX: 'https://s3-eu-west-1.amazonaws.com/titanclientdev/',
   ENV: ENV,
   HMR: HMR
 };
@@ -79,7 +81,8 @@ module.exports = helpers.validate({
         'ENV': JSON.stringify(metadata.ENV),
         'NODE_ENV': JSON.stringify(metadata.ENV),
         'HMR': HMR,
-		'API': JSON.stringify(metadata.API)
+		'API': JSON.stringify(metadata.API),
+        'EXTERNAL_URL_PREFIX': JSON.stringify(metadata.EXTERNAL_URL_PREFIX)
       }
     })
   ],

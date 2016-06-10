@@ -1,32 +1,32 @@
-import {Component, Input} from '@angular/core';
+import {Component, Output, EventEmitter} from '@angular/core';
 import {CORE_DIRECTIVES, FORM_DIRECTIVES, NgClass, NgStyle} from '@angular/common';
 import {FILE_UPLOAD_DIRECTIVES, FileUploader, Headers} from 'ng2-file-upload';
 import {FileItem} from 'ng2-file-upload/components/file-upload/file-item.class';
-// webpack html imports
-let template = require('./file-upload.html');
+import {API_ENDPOINT} from '../../../config';
 
-// const URL = '/api/';
-const URL = 'http://localhost:3001/nodes/api/';
+const UPLOADURL: string = API_ENDPOINT.concat('/nodes/api/');
 
 @Component({
     selector: 'file-upload',
-    template: template,
+    template: require('./file-upload.html'),
     styles: [require('./file-upload.css')],
     directives: [FILE_UPLOAD_DIRECTIVES, NgClass, NgStyle, CORE_DIRECTIVES, FORM_DIRECTIVES]
 })
 
-export class FileUpload {
-
+export class FileUpload extends FileUploader {
+    @Output() onUploaded = new EventEmitter<String>();
     constructor(){
-
-        this.uploader.setOptions({
+        super({url:  UPLOADURL});
+        this.setOptions({
             authToken: 'Bearer ' + localStorage.getItem('id_token')
         });
-        this.uploader.onSuccessItem = this.handleSuccess;
+        this.onSuccessItem = this.handleSuccess;
+        console.log(`Upload URL is ${UPLOADURL}`);
         
     }
-
-    public uploader:FileUploader = new FileUploader({url: URL});
+    public uploadURL:string = API_ENDPOINT.concat('/nodes/api/');
+//    public uploader:FileUploader = new FileUploader({url: this.uploadURL});
+    public uploader:FileUploader = this;
     public fileUploaded:boolean = false;
     public fileUploadedName:string = '';
     public hasBaseDropZoneOver:boolean = false;
@@ -39,13 +39,18 @@ export class FileUpload {
 
         console.log(`success for ${item.file.name}`);
         this.fileUploadedName = item.file.name;
+        this.onUploaded.emit(item.file.name);
+        console.log(`success for ${this.fileUploadedName}`);
         return { item: item, response: response, status: status, headers: headers };
     };
 
     public removeUpload() {
-        this.uploader.clearQueue();
+        let uploadedFile = this.queue[0].file.name;
+        console.log(`File uploaded is ${uploadedFile}`);
+        console.log(`File uploaded is ${this.fileUploadedName}`);
+        this.clearQueue();
         this.fileUploaded = true;
-        console.log(`File is ${this.fileUploadedName}`);
+        this.onUploaded.emit(uploadedFile);
     };
 
 }

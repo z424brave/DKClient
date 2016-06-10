@@ -14,6 +14,10 @@ import {NotificationService} from './app/common/service/notification-service';
 
 document.addEventListener('DOMContentLoaded', function main() {
 	console.log(`Running app in ${process.env.NODE_ENV} pointing at ${process.env.API}`);
+    console.log(`ENV is  ${process.env.ENV}`);
+    console.log(`Host is ${process.env.HOST}`);
+    console.log(`Port is ${process.env.PORT}`);
+    console.log(`API is  ${process.env.API}`);
 	bootstrap(App, [
         AuthService,
         HttpClient,

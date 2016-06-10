@@ -13,4 +13,12 @@ export class UpdateFromSelectValue {
         this.selected = !this.selected;
     }
 
+    setSelected() {
+        this.selected = true;
+    }
+
+    setDeselected() {
+        this.selected = false;
+    }
+
 }

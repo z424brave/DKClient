@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
 import {FORM_DIRECTIVES,
     FormBuilder,
     Validators,
@@ -14,8 +14,7 @@ import {authCheck} from '../../auth/auth-check';
     directives: [FORM_DIRECTIVES],
     providers: [ChannelService, HttpClient],
     template: require('./channel-detail.html'),
-    styles: [require('./channel-detail.css'), require('../../app.css')],
-    inputs: ['channel']
+    styles: [require('./channel-detail.css'), require('../../app.css')]
 })
 
 @CanActivate((next: ComponentInstruction, previous: ComponentInstruction) => {
@@ -27,6 +26,7 @@ export class ChannelDetail implements OnInit {
     channel: Channel;
 //    roles = ['admin', 'user'];
     statuses = ['active', 'deleted'];
+    drivers = ['Twitter', 'Facebook', 'Game Guide'];
     channelForm: ControlGroup;
     name: AbstractControl;
 	driver: AbstractControl;
@@ -41,11 +41,12 @@ export class ChannelDetail implements OnInit {
     submitChannel(value) {
 
         this.submitted = true;
-		console.log(`in submitUser - ${this.channelForm.valid}`);
+		console.log(`in submitChannel - ${this.channelForm.valid}`);
         if (this.channelForm.valid) {
             this._channelService.saveChannel(this.channel).subscribe(
                 data => {
                      this.channel =  data;
+                     this._router.navigate(['ChannelDetail', {id: this.channel._id}]);
                 }
             );
         } else {
@@ -77,6 +78,11 @@ export class ChannelDetail implements OnInit {
         this.name = this.channelForm.controls['name'];
         this.driver = this.channelForm.controls['driver'];
 
+    }
+
+    onChannelDriverChange(driver) {
+
+        console.log(`in driver change - ${driver}`);
     }
 
     cancel($event) {

@@ -20,6 +20,7 @@ import {LanguageService} from "../../common/service/language-service";
 import {VersionSort} from "../../common/version-sort-pipe";
 import {TagService} from "../../common/service/tag-service";
 import {FileUpload} from "../../common/directives/file-upload/file-upload";
+import {EXTERNAL_URL_PREFIX} from '../../config';
 
 let _ = require('lodash');
 
@@ -37,6 +38,7 @@ let _ = require('lodash');
 
 export class ContentDetail implements OnInit {
 
+    urlPrefix: string = EXTERNAL_URL_PREFIX;
     content: Content;
 	currentVersion: boolean;
     allValues: Array<UpdateFromSelectValue> = [];
@@ -46,6 +48,7 @@ export class ContentDetail implements OnInit {
 	types: String[] = ['text','html','image'];
     node: ContentNode;
 	tags: Array<Tag>;
+    uploadedFileName: string = "";
 
     isNewNode: boolean;
     saveAction: string;
@@ -65,9 +68,18 @@ export class ContentDetail implements OnInit {
         media.language = new Language('English', 'EN');
  		this.activeTab = new ContentTab(media, true, true);
 		this.editorContent = this.activeTab.content;
+        this.uploadedFileName = "";
 
     }
 
+    onUploaded(upLoadedFileName: string) {
+        console.log(`Content Detail : Uploaded file is : ${upLoadedFileName}`);
+        this.uploadedFileName = upLoadedFileName;
+        this.getTabForLanguage(this.activeTab.language).content = upLoadedFileName;
+        this.getTabForLanguage(this.activeTab.language).media.content = upLoadedFileName;
+ 
+    }
+    
     private _getLanguages() {
 
         this._languageService.getLanguages()
@@ -80,7 +92,7 @@ export class ContentDetail implements OnInit {
 
     private _getAllTags() {
 
-        console.log(`in content-details / getAllTags`);
+        console.log(`in content-details / _getAllTags`);
         this._tagService.getLexicons().subscribe(
             data => {
 
@@ -90,13 +102,14 @@ export class ContentDetail implements OnInit {
                 });
 
                 console.log(`in getAllTags - Tags : ${this.allValues.length} - ${JSON.stringify(this.allValues)}`);
-
+                this._initNode();
             }
         );
 
     }
 
-    private _initNode(id: string) {
+    private _initNode() {
+        let id = this._routeParams.get('id');
         if (id) {
             this._loadNode(id, true);
         } else {
@@ -131,7 +144,7 @@ export class ContentDetail implements OnInit {
                     console.log(`Node : ${JSON.stringify(this.node)}`);
                     this.currentVersion = false;
                     this.initContentTabs(initTabs);
-
+                    console.log(`All Values is - ${JSON.stringify(this.allValues)}`);
                     this.allValues = this.allValues.map((value) => {
 
                         if ( this.node.tags.indexOf(value.key) > -1 ) {
@@ -158,8 +171,6 @@ export class ContentDetail implements OnInit {
         let id = this._routeParams.get('id');
 		console.log(`In ngOnInit - ${this._routeParams.get('versionNo')}`);
         this._getAllTags();
-        this._initNode(id);
-		console.log(`In ngOnInit - ${this.editorContent} : ${JSON.stringify(this.activeTab)}`);
 
     }
 
@@ -241,6 +252,7 @@ export class ContentDetail implements OnInit {
             return selectedValue.key;
         });
     }
+
     onSubmit(valid) {
 	
         this.submitted = true;
@@ -267,9 +279,17 @@ export class ContentDetail implements OnInit {
                 var contentChanged = ContentDetail.hasContentChanged(this.node.content[this.node.content.length - 1].media, this.content.media);
 				console.log(`In onSubmit before update node - contentChanged is ${contentChanged}`);
 
-				console.log(JSON.stringify(this.node));				
+				console.log(JSON.stringify(this.node));
+                if (contentChanged) {
+                    ++this.content.versionNo;
+                    this.node.content.push(this.content);
+                }
                 this._contentService.updateNode(this.node)
-                    .toPromise()
+                    .subscribe(node => {
+                        console.log(`before server ${JSON.stringify(this.node)}`);
+                        this._router.navigate(['ContentDetail', {id: this.node._id}]);
+                    });
+/*                    .toPromise()
                     .then(() => {
                         if (contentChanged) {
                             ++this.content.versionNo;
@@ -281,7 +301,7 @@ export class ContentDetail implements OnInit {
                     .then(() => {
                         console.log(`Reloading node after update : ${this.node._id}`);
                         this._router.navigate(['ContentDetail', {id: this.node._id}]);
-                    });
+                    });*/
 
             }
         }
@@ -297,7 +317,8 @@ export class ContentDetail implements OnInit {
             });
             // got matching language in new for old - now check content
             console.log(`found : ${JSON.stringify(matchNew)}`);
-            if (!(matchNew.content === media.content)) {
+            if (!(matchNew[0].content === media.content)) {
+                console.log(`different : ${JSON.stringify(matchNew.content)} / ${JSON.stringify(media.content)}`);
                 return true;
             }
 
@@ -410,9 +431,9 @@ export class ContentDetail implements OnInit {
     }
 
     translate($event) {
-	
+
+        console.log(`Translate - ${JSON.stringify($event)}`);
         $event.preventDefault();
-        console.log(`Translate - selectedValues is ${JSON.stringify(this.allValues)}`);
 
     }
 
