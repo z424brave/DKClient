@@ -60,9 +60,12 @@ export class AuthService {
                         observer.next('SUCCESS');
                     },
                     err => {
-						console.log(`in authenticate err - ${err.status}`);	
+						console.log(`in authenticate err - ${JSON.stringify(err)}`);
                         if (err.status === 401) {
-                            observer.next('ACCESS_DENIED');
+                            let jsonResponse = JSON.parse(err._body);
+                            let errResponse = jsonResponse.message ? jsonResponse.message : 'ACCESS_DENIED' ;
+                            console.log(`in 401 : ${JSON.stringify(jsonResponse)} / ${errResponse}`);
+                            observer.next(errResponse);
                         } else {
                             this._notificationService.handleError(
                                 new ApplicationError(

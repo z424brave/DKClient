@@ -33,7 +33,8 @@ export class UserDetail implements OnInit {
     name: AbstractControl;
 	email: AbstractControl;
 //	role: AbstractControl;
-	status: AbstractControl;	
+	status: AbstractControl;
+    newUser: boolean = false;
     submitted: boolean = false;
     allValues: Array<UpdateFromSelectValue> = [];
 
@@ -101,6 +102,7 @@ export class UserDetail implements OnInit {
         this._setRoles();
         //console.log('User detail init');
         let id = this._routeParams.get('id');
+        this.newUser = id ? false : true;
         if (id) {
             this._getUser(id);
         } else {
@@ -117,7 +119,8 @@ export class UserDetail implements OnInit {
             this.user.roles = this._saveRolesToUser();
             this._userService.saveUser(this.user).subscribe(
                 data => {
-                     this.user =  data;
+ //                    this.user =  data;
+                     this._router.navigate(['UserDetail', {id: this.user._id}]);
                 }
             );
         } else {
@@ -132,7 +135,7 @@ export class UserDetail implements OnInit {
 
     cancel($event) {
         $event.preventDefault();
-        this._router.navigate(['User']);
+        this._router.navigate(['UserList']);
     }
 
 }

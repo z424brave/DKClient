@@ -59,4 +59,24 @@ export class S3Service {
         });
     };
 
+    createFile(newFile: string) {
+        console.log(`In s3 / createFile - ${newFile}`);
+        return Observable.create(observer => {
+            this._httpClient.put(`${this.baseUrl}?fileName=${newFile}`,'')
+                .map((responseData) => {
+                    console.log(`In s3 / createFile - ${newFile} - after put ${JSON.stringify(responseData.json())}`);
+                    return responseData.json();
+                })
+                .subscribe(
+                    data => observer.next(data),
+                    err => this._notificationService.handleError(
+                        new ApplicationError(
+                            'Error updating S3',
+                            err)
+                    ),
+                    () => observer.complete()
+                );
+
+        });
+    };
 }

@@ -26,7 +26,7 @@ export class ChannelDetail implements OnInit {
     channel: Channel;
 //    roles = ['admin', 'user'];
     statuses = ['active', 'deleted'];
-    drivers = ['Twitter', 'Facebook', 'Game Guide'];
+    drivers = ['Twitter', 'Facebook', 'Game Guide', 'Launcher', 'S3'];
     channelForm: ControlGroup;
     name: AbstractControl;
 	driver: AbstractControl;
@@ -58,7 +58,7 @@ export class ChannelDetail implements OnInit {
     }
 
     ngOnInit() {
-        //console.log('User detail init');
+        console.log('Channel detail init');
         let id = this._routeParams.get('id');
         if (id) {
             this.getChannel(id);
@@ -87,7 +87,7 @@ export class ChannelDetail implements OnInit {
 
     cancel($event) {
         $event.preventDefault();
-        this._router.navigate(['Channel']);
+        this._router.navigate(['ChannelList']);
     }
 
     private getChannel(id: string) {

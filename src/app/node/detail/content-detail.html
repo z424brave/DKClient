@@ -95,9 +95,11 @@
                          (deselect)="languageTab.active = false"
                          (select)="selectTab(languageTab)"
                          [disabled]="languageTab.disabled">
-                        <img *ngIf="languageTab.content" class="content-image" src="{{ urlPrefix + 'Warhammer/' + languageTab.content }}"/>
+                        <div *ngIf="languageTab.content">
+                            <image-box [imageFileName]="languageTab.content"></image-box>
+                        </div>
                         <div *ngIf="!languageTab.content" class="row">
-                            <file-upload (onUploaded)="onUploaded($event)"></file-upload>
+                            <file-upload (onUploaded)="onUploaded($event)" (onFileNameSaved)="onFileNameSaved($event)"></file-upload>
                         </div>
                     </tab>
                 </tabset>
@@ -121,5 +123,5 @@
         <button *ngIf="currentVersion" class="btn btn-default" (click)="publish($event)">Publish</button>
         <button class="btn btn-default" (click)="cancel($event)">Cancel</button>
     </div>
-
+    <content-publish></content-publish>
 </form>

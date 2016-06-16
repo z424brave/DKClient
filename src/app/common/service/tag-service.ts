@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Http, Headers} from '@angular/http';
 import {HttpClient} from '../../common/http-client';
 import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
 import {Notification} from '../directives/notification-center/notification';
 import {ApplicationError} from '../../common/error';
 import {API_ENDPOINT} from '../../config';
@@ -48,53 +46,72 @@ export class TagService {
 	}
 	
 	getLexicons() {
+
         console.log(`In getLexicons`);
-        var that = this;
+
         return Observable.create(observer => {
-            this._httpClient.get(`${this.baseUrl}list`)
+            this._httpClient.get(`${this.baseUrl}list?status=active`)
                 .map((responseData) => {
-				    console.log(`Lexicons : ${JSON.stringify(responseData)}`);
+                    console.log(`Lexicons : ${JSON.stringify(responseData)}`);
                     return responseData.json();
                 })
                 .subscribe(
-                    data => observer.next(data),
+                    data => {
+                        observer.next(data);
+                    },
                     err => {
-                        that._notificationService.handleError(
+                        this._notificationService.handleError(
                             new ApplicationError(
                                 'Error loading lexicons',
                                 err));
+                    },
+                    () => {
+                        observer.complete();
                     }
-                    ,
-                    () => observer.complete()
+
                 );
-        });
+
+            }
+
+        );
+
     }
 
     getTags(lexiconId) {
+
 	    console.log(`In getTags - ${lexiconId}`);
-        var that = this;
+
         return Observable.create(observer => {
             this._httpClient.get(this.baseUrl.concat(lexiconId).concat('/tags/'))
                 .map((responseData) => {
                     return responseData.json();
                 })
                 .subscribe(
-                    data => observer.next(data),
+                    data => {
+                        observer.next(data);
+                    },
                     err => {
-                        that._notificationService.handleError(
+                        this._notificationService.handleError(
                             new ApplicationError(
                                 'Error loading tags',
                                 err));
+                    },
+                    () => {
+                        observer.complete();
                     }
-                    ,
-                    () => observer.complete()
+
                 );
-        });
-    };
+
+            }
+
+        );
+
+    }
 
     updateTag(lexiconId: string, tag: Tag) {
-        var that = this;
+
         console.log('update : ' + tag.name);
+
         return Observable.create(observer => {
                 this._httpClient.put(this.baseUrl.concat(lexiconId).concat('/tags'), JSON.stringify(tag))
                     .map((responseData) => {
@@ -106,20 +123,25 @@ export class TagService {
                             observer.next('SUCCESS');
                         },
                         err => {
-                            that._notificationService.handleError(
+                            this._notificationService.handleError(
                                 new ApplicationError(
                                     'Error updating tag',
                                     err));
+                        },
+                        () => {
+                            observer.complete();
                         }
-                        ,
-                        () => observer.complete()
+
                     );
-            }
+
+                }
+
         );
+
     }
 
     saveLexicon(lexicon: Lexicon) {
-        var that = this;
+
         return Observable.create(observer => {
                 this._httpClient.post(this.baseUrl, JSON.stringify(lexicon))
                     .map((responseData) => {
@@ -128,27 +150,31 @@ export class TagService {
                     .subscribe(
                         data => {
                             observer.next(data);
-                            that._notificationService.publish(new Notification(
+                            this._notificationService.publish(new Notification(
                                 'Lexicon saved successfully',
                                 Notification.types.SUCCESS));
 
                         },
                         err => {
-                            that._notificationService.handleError(
+                            this._notificationService.handleError(
                                 new ApplicationError(
                                     'Error saving lexicon',
                                     err));
+                        },
+                        () => {
+                            observer.complete();
                         }
-                        ,
-                        () => observer.complete()
+
                     );
-            }
+
+                }
+
         );
 
     }
 
     updateLexicon(lexicon: Lexicon) {
-        var that = this;
+
         return Observable.create(observer => {
                 this._httpClient.put(this.baseUrl.concat(lexicon._id), JSON.stringify(lexicon))
                     .map((responseData) => {
@@ -157,26 +183,30 @@ export class TagService {
                     .subscribe(
                         data => {
                             observer.next('SUCCESS');
-                            that._notificationService.publish(new Notification(
+                            this._notificationService.publish(new Notification(
                                 'Lexicon updated successfully',
                                 Notification.types.SUCCESS));
                         },
                         err => {
-                            that._notificationService.handleError(
+                            this._notificationService.handleError(
                                 new ApplicationError(
                                     'Error updating lexicon',
                                     err));
+                        },
+                        () => {
+                            observer.complete();
                         }
-                        ,
-                        () => observer.complete()
+
                     );
-            }
+
+                }
+
         );
 
     }
 
     deleteLexicon(lexicon: Lexicon) {
-        var that = this;
+
         return Observable.create(observer => {
                 this._httpClient.delete(this.baseUrl.concat(lexicon._id))
                     .map((responseData) => {
@@ -185,27 +215,31 @@ export class TagService {
                     .subscribe(
                         data => {
                             observer.next('SUCCESS');
-                            that._notificationService.publish(new Notification(
+                            this._notificationService.publish(new Notification(
                                 'Lexicon deleted successfully',
                                 Notification.types.SUCCESS));
 
                         },
                         err => {
-                            that._notificationService.handleError(
+                            this._notificationService.handleError(
                                 new ApplicationError(
                                     'Error deleting lexicon',
                                     err));
+                        },
+                        () => {
+                            observer.complete();
                         }
-                        ,
-                        () => observer.complete()
+
                     );
-            }
+
+                }
+
         );
 
     }
 
     addTag(lexiconId: string, tag: Tag) {
-        var that = this;
+
         return Observable.create(observer => {
                 this._httpClient.post(this.baseUrl.concat(lexiconId).concat('/tags'), JSON.stringify(tag))
                     .map((responseData) => {
@@ -216,21 +250,25 @@ export class TagService {
                             observer.next('SUCCESS');
                         },
                         err => {
-                            that._notificationService.handleError(
+                            this._notificationService.handleError(
                                 new ApplicationError(
                                     'Error adding tag',
                                     err));
+                        },
+                        () => {
+                            observer.complete();
                         }
-                        ,
-                        () => observer.complete()
+
                     );
-            }
+
+                }
+
         );
 
     }
 
     deleteTag(lexiconId: string, tagId: string) {
-        var that = this;
+
         return Observable.create(observer => {
                 this._httpClient.delete(this.baseUrl.concat(lexiconId).concat('/tags/').concat(tagId))
                     .map((responseData) => {
@@ -241,15 +279,19 @@ export class TagService {
                             observer.next('SUCCESS');
                         },
                         err => {
-                            that._notificationService.handleError(
+                            this._notificationService.handleError(
                                 new ApplicationError(
                                     'Error deleting tag',
                                     err));
+                        },
+                        () => {
+                            observer.complete();
                         }
-                        ,
-                        () => observer.complete()
+
                     );
-            }
+
+                }
+
         );
 
     }

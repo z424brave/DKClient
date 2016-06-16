@@ -6,7 +6,6 @@ import {TreeNode} from '../common/model/tree-node';
 import {TreeNodeService} from '../common/service/tree-node-service';
 import {authCheck} from '../auth/auth-check';
 import {MainMenu} from '../menu/menu-component';
-import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {S3Service} from '../common/service/s3Service';
 

@@ -30,7 +30,14 @@
             {{fileUploadedName}}
 
         </div>
-        <div class="col-md-9" style="margin-bottom: 40px">
+        <div class="col-md-9" style="margin-bottom: 40px" *ngIf="(fileUploadedName)">
+            <h3>Select Target Folder</h3>
+            <tree-view [root]="s3Node"></tree-view>
+            <label for="targetFileName">Target File Name</label>
+            <input type="text" id="targetFileName" class="form-control" value="{{currentFolder + fileUploadedName}}" />
+            <button class="btn btn-default" (click)="saveFileName($event)">Save File</button>
+        </div>
+        <div class="col-md-9" style="margin-bottom: 40px" *ngIf="(!fileUploadedName)">
 
             <h3>Upload queue</h3>
             <p>Queue length: {{ uploader?.queue?.length }}</p>

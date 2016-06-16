@@ -41,7 +41,7 @@ export class TreeView implements OnInit, OnDestroy{
     }
 
     selectNode(node) {
-        console.log(`Node selected`);
+        console.log(`Node selected - ${node.key}`);
         this._treeNodeService.displayLeafNodes("");
         this._treeNodeService.displayLeafNodes(node.key);
 

@@ -1,4 +1,4 @@
-import {OnInit, Component} from "@angular/core";
+import {OnInit, Component, ViewChild} from "@angular/core";
 import {Router, RouteParams, CanActivate, ComponentInstruction} from "@angular/router-deprecated";
 import {CORE_DIRECTIVES, FORM_DIRECTIVES} from "@angular/common";
 import {TAB_DIRECTIVES} from "ng2-bootstrap/ng2-bootstrap";
@@ -21,12 +21,19 @@ import {VersionSort} from "../../common/version-sort-pipe";
 import {TagService} from "../../common/service/tag-service";
 import {FileUpload} from "../../common/directives/file-upload/file-upload";
 import {EXTERNAL_URL_PREFIX} from '../../config';
+import {ImageBox} from "../../common/directives/image-box/image-box";
+import {TreeNode} from "../../common/model/tree-node";
+import {TreeView} from "../../common/directives/tree-view/tree-view";
+import {TreeNodeService} from "../../common/service/tree-node-service";
+import {ContentPublish} from "./publish/content-publish";
 
 let _ = require('lodash');
 
 @Component({
-    directives: [InlineEditor, TAB_DIRECTIVES, CORE_DIRECTIVES, FORM_DIRECTIVES, MainMenu, UpdateFromSelect, FileUpload],
-    providers: [ContentService, TagService, LanguageService],
+    directives: [InlineEditor, TAB_DIRECTIVES, CORE_DIRECTIVES,
+        FORM_DIRECTIVES, MainMenu, UpdateFromSelect,
+        FileUpload, ImageBox, TreeView, ContentPublish],
+    providers: [ContentService, TagService, LanguageService, TreeNodeService],
     template: require('./content-detail.html'),
 	pipes: [VersionSort],
     styles: [require('./content.css'), require('../../app.css')]
@@ -49,13 +56,16 @@ export class ContentDetail implements OnInit {
     node: ContentNode;
 	tags: Array<Tag>;
     uploadedFileName: string = "";
-
     isNewNode: boolean;
     saveAction: string;
+    s3Node: TreeNode = null;
 
     private languageTabs: Array<ContentTab>;
     private submitted: boolean;
     private supportedLanguages = [];
+
+    @ViewChild(ContentPublish)
+    private contentPublish: ContentPublish;
 
     constructor(private _contentService: ContentService,
                 private _tagService: TagService,
@@ -63,6 +73,7 @@ export class ContentDetail implements OnInit {
                 private _authService: AuthService,
                 private _routeParams: RouteParams,
                 private _router: Router) {
+    
         this.languageTabs = [];
         var media = new Media();
         media.language = new Language('English', 'EN');
@@ -75,11 +86,14 @@ export class ContentDetail implements OnInit {
     onUploaded(upLoadedFileName: string) {
         console.log(`Content Detail : Uploaded file is : ${upLoadedFileName}`);
         this.uploadedFileName = upLoadedFileName;
-        this.getTabForLanguage(this.activeTab.language).content = upLoadedFileName;
-        this.getTabForLanguage(this.activeTab.language).media.content = upLoadedFileName;
- 
     }
-    
+
+    onFileNameSaved(onSavedFileName: string) {
+        console.log(`Content Detail : onFileNameSaved : ${onSavedFileName}`);
+        this.getTabForLanguage(this.activeTab.language).content = onSavedFileName;
+        this.getTabForLanguage(this.activeTab.language).media.content = onSavedFileName;
+    }
+
     private _getLanguages() {
 
         this._languageService.getLanguages()
@@ -171,6 +185,7 @@ export class ContentDetail implements OnInit {
         let id = this._routeParams.get('id');
 		console.log(`In ngOnInit - ${this._routeParams.get('versionNo')}`);
         this._getAllTags();
+        this.s3Node = new TreeNode('root','/', '');
 
     }
 
@@ -371,6 +386,7 @@ export class ContentDetail implements OnInit {
 	
 //	    console.log(`getTabForLanguage - passed ${JSON.stringify(language)}`);
         return _.find(this.languageTabs, (tab: ContentTab) => {
+            console.log(`getTabForLanguage - passed ${JSON.stringify(language.iso3166)} - returning ${JSON.stringify(tab.media.language.iso3166)}`);
             return tab.media.language.iso3166 == language.iso3166;
         });
 
@@ -437,9 +453,11 @@ export class ContentDetail implements OnInit {
 
     }
 
-    static publish($event) {
-	
+    publish($event) {
+
+        console.log(`Publish - ${JSON.stringify($event)}`);
         $event.preventDefault();
+        this.contentPublish.showPublish(`Lets publish this - ${this.node.name}`);
 
     }
 

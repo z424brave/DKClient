@@ -16,11 +16,12 @@ import {ApplicationError} from '../common/error';
 
 export class LoginComponent {
 
-    submitted = false;
+    submitted: boolean = false;
 
     user: LoginUser;
 
     invalidCredentials: boolean;
+    loginMessage: string ;
 
     constructor(private _authService: AuthService,
                 private _notificationService: NotificationService,
@@ -42,6 +43,7 @@ export class LoginComponent {
                             this._router.navigate(['/Home']);
                         } else {
                             this.invalidCredentials = true;
+                            this.loginMessage = response;
                         }
                     },
                     err => this._notificationService.handleError(
