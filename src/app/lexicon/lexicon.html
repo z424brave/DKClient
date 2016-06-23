@@ -11,14 +11,14 @@
     <div class="col-md-6">
         <label>&nbsp;</label>
         <div class="form-inline">
-            <input type="text" [(ngModel)]="newLexicon.name" class="form-control text-input">
-            <button type="submit" class="btn btn-success" (click)="createLexicon()">Create lexicon</button>
+            <input type="text" [(ngModel)]="newLexicon.name" class="form-control text-input pull-right" style="margin-right: 0px;">
+            <button type="submit" class="btn btn-success pull-right" (click)="createLexicon()">Create lexicon</button>
         </div>
     </div>
 </div>
 <div *ngIf="lexicon._id">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="form-inline">
                 <span><update-textfield [value]="lexicon"
                                         (changeEmitter)="onLexiconUpdated($event)"></update-textfield></span>
@@ -34,20 +34,24 @@
                 </span>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-inline">
-                <input type="text" [(ngModel)]="newTag.name" class="form-control text-input">
-                <button type="submit" class="btn btn-success" (click)="addTag()">Add tag</button>
-            </div>
-        </div>
     </div>
     <div class="tag-table">
         <h3>Tags</h3>
         <table class="table">
+            <thead>
+            <tr>
+                <th>Tag Name</th>
+                <th>Tag Description</th>
+                <th>Remove</th>
+            </tr>
+            </thead>
             <tbody>
             <tr *ngFor="let tag of tags | paginate: { itemsPerPage: 6, currentPage: p }" >
                 <td>
-                    <update-textfield [value]="tag" (changeEmitter)="onTagUpdated($event)"></update-textfield>
+                    <h4><b>{{tag.name}}</b></h4>
+                </td>
+                <td>
+                    {{tag.description}}
                 </td>
                 <td class="delete-cell">
                     <i (click)="deleteTag(tag._id)" class="fa fa-minus-square"></i>

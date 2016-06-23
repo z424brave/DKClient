@@ -12,64 +12,64 @@ import {Lexicon} from '../model/lexicon/lexicon';
 export class TagService {
 
     private baseUrl: string;
-	private _selectedTags: Array<string> ;
+    private _selectedTags: Array<string> ;
 
     constructor(private _httpClient: HttpClient,
-				private _notificationService: NotificationService) {
-				
-        this.baseUrl = API_ENDPOINT.concat('/lexicons/');
-		this._selectedTags = [];
-		console.log(`In tag-service - selected tags set to size ${this._selectedTags.length}`);
-		
+                private _notificationService: NotificationService) {
+
+        this.baseUrl = API_ENDPOINT.concat('/tags/');
+        this._selectedTags = [];
+        console.log(`In tag-service - selected tags set to size ${this._selectedTags.length}`);
+
     }
 
-	getSelectedTags() : Array<string> {
-	
-		return this._selectedTags; 
-		
-	}
- 
-	removeSelectedTag(tag: Tag) : void {
+    getSelectedTags() : Array<string> {
 
-		if(this._selectedTags.indexOf(tag.name) != -1){
-			this._selectedTags.splice(this._selectedTags.indexOf(tag.name), 1);
-		}
-	    console.log(`In removeSelectedTag - ${tag.name} - there are now ${this._selectedTags.length} selected tags`);			
+        return this._selectedTags;
 
-	}
+    }
 
-	addSelectedTag(tag: Tag) : void {
-	
-		this._selectedTags.push(tag.name); 
-	    console.log(`In addSelectedTag - ${tag.name} - there are now ${this._selectedTags.length} selected tags`);	
-		
-	}
-	
-	getLexicons() {
+    removeSelectedTag(tag: Tag) : void {
+
+        if(this._selectedTags.indexOf(tag.name) != -1){
+            this._selectedTags.splice(this._selectedTags.indexOf(tag.name), 1);
+        }
+        console.log(`In removeSelectedTag - ${tag.name} - there are now ${this._selectedTags.length} selected tags`);
+
+    }
+
+    addSelectedTag(tag: Tag) : void {
+
+        this._selectedTags.push(tag.name);
+        console.log(`In addSelectedTag - ${tag.name} - there are now ${this._selectedTags.length} selected tags`);
+
+    }
+
+    getLexicons() {
 
         console.log(`In getLexicons`);
 
         return Observable.create(observer => {
-            this._httpClient.get(`${this.baseUrl}list?status=active`)
-                .map((responseData) => {
-                    console.log(`Lexicons : ${JSON.stringify(responseData)}`);
-                    return responseData.json();
-                })
-                .subscribe(
-                    data => {
-                        observer.next(data);
-                    },
-                    err => {
-                        this._notificationService.handleError(
-                            new ApplicationError(
-                                'Error loading lexicons',
-                                err));
-                    },
-                    () => {
-                        observer.complete();
-                    }
+                this._httpClient.get(`${this.baseUrl}list?status=active`)
+                    .map((responseData) => {
+                        console.log(`Lexicons : ${JSON.stringify(responseData)}`);
+                        return responseData.json();
+                    })
+                    .subscribe(
+                        data => {
+                            observer.next(data);
+                        },
+                        err => {
+                            this._notificationService.handleError(
+                                new ApplicationError(
+                                    'Error loading lexicons',
+                                    err));
+                        },
+                        () => {
+                            observer.complete();
+                        }
 
-                );
+                    );
 
             }
 
@@ -77,30 +77,30 @@ export class TagService {
 
     }
 
-    getTags(lexiconId) {
+    getTags() {
 
-	    console.log(`In getTags - ${lexiconId}`);
+        console.log(`In getTags`);
 
         return Observable.create(observer => {
-            this._httpClient.get(this.baseUrl.concat(lexiconId).concat('/tags/'))
-                .map((responseData) => {
-                    return responseData.json();
-                })
-                .subscribe(
-                    data => {
-                        observer.next(data);
-                    },
-                    err => {
-                        this._notificationService.handleError(
-                            new ApplicationError(
-                                'Error loading tags',
-                                err));
-                    },
-                    () => {
-                        observer.complete();
-                    }
+                this._httpClient.get(this.baseUrl.concat('list'))
+                    .map((responseData) => {
+                        return responseData.json();
+                    })
+                    .subscribe(
+                        data => {
+                            observer.next(data);
+                        },
+                        err => {
+                            this._notificationService.handleError(
+                                new ApplicationError(
+                                    'Error loading tags',
+                                    err));
+                        },
+                        () => {
+                            observer.complete();
+                        }
 
-                );
+                    );
 
             }
 
@@ -115,7 +115,7 @@ export class TagService {
         return Observable.create(observer => {
                 this._httpClient.put(this.baseUrl.concat(lexiconId).concat('/tags'), JSON.stringify(tag))
                     .map((responseData) => {
-						console.log(`update : ${tag.name} ${responseData.json()}`);					
+                        console.log(`update : ${tag.name} ${responseData.json()}`);
                         return responseData.json();
                     })
                     .subscribe(
@@ -134,7 +134,7 @@ export class TagService {
 
                     );
 
-                }
+            }
 
         );
 
@@ -167,7 +167,7 @@ export class TagService {
 
                     );
 
-                }
+            }
 
         );
 
@@ -199,7 +199,7 @@ export class TagService {
 
                     );
 
-                }
+            }
 
         );
 
@@ -232,21 +232,21 @@ export class TagService {
 
                     );
 
-                }
+            }
 
         );
 
     }
 
-    addTag(lexiconId: string, tag: Tag) {
+    addTag(tag: Tag) {
 
         return Observable.create(observer => {
-                this._httpClient.post(this.baseUrl.concat(lexiconId).concat('/tags'), JSON.stringify(tag))
+                this._httpClient.post(this.baseUrl, JSON.stringify(tag))
                     .map((responseData) => {
                         return responseData.json();
                     })
                     .subscribe(
-                        data => {
+                        () => {
                             observer.next('SUCCESS');
                         },
                         err => {
@@ -261,21 +261,21 @@ export class TagService {
 
                     );
 
-                }
+            }
 
         );
 
     }
 
-    deleteTag(lexiconId: string, tagId: string) {
+    deleteTag(tagId: string) {
 
         return Observable.create(observer => {
-                this._httpClient.delete(this.baseUrl.concat(lexiconId).concat('/tags/').concat(tagId))
+                this._httpClient.delete(this.baseUrl.concat(tagId))
                     .map((responseData) => {
                         return responseData.json();
                     })
                     .subscribe(
-                        data => {
+                        () => {
                             observer.next('SUCCESS');
                         },
                         err => {
@@ -290,7 +290,7 @@ export class TagService {
 
                     );
 
-                }
+            }
 
         );
 

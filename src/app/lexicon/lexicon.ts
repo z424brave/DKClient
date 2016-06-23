@@ -5,6 +5,7 @@ import {FORM_DIRECTIVES, CORE_DIRECTIVES} from '@angular/common';
 import {Lexicon} from './../common/model/lexicon/lexicon';
 import {Tag} from '../common/model/lexicon/tag';
 
+import {LexiconService} from './../common/service/lexicon-service';
 import {TagService} from './../common/service/tag-service';
 import {authCheck} from '../auth/auth-check';
 import {MainMenu} from '../menu/menu-component';
@@ -16,7 +17,7 @@ let _ = require('lodash');
 @Component({
     template: require('./lexicon.html'),
     styles: [require('./lexicon.css'), require('../app.css')],
-    providers: [TagService, PaginationService],
+    providers: [TagService, LexiconService, PaginationService],
     directives: [UpdateTextfield, MainMenu, CORE_DIRECTIVES, FORM_DIRECTIVES,PaginationControlsCmp],
     pipes: [PaginatePipe]
 })
@@ -39,7 +40,7 @@ export class LexiconComponent implements OnInit {
 
     confirmDelete: boolean;
 
-    constructor(private _tagService: TagService) {
+    constructor(private _tagService: TagService, private _lexiconService: LexiconService) {
 
     }
 
@@ -50,7 +51,7 @@ export class LexiconComponent implements OnInit {
 
     init() {
 	    console.log(`In init in lexicon`);	
-        this._tagService.getLexicons()
+        this._lexiconService.getLexicons()
             .subscribe(
                 data => this.lexicons = data
             );
@@ -65,11 +66,13 @@ export class LexiconComponent implements OnInit {
             return t._id === lexiconId;
         });
 
-        this._tagService.getTags(lexiconId)
+/*        this._tagService.getTags(lexiconId)
             .subscribe(
                 tags => this.tags = tags
-            );
+            );*/
 
+        this.tags = this.lexicon.tags;
+        console.log(`In onLexiconSelectChanged with ${lexiconId} : ${JSON.stringify(this.tags)}`);
         this.newLexicon = new Lexicon();
         this.newTag = new Tag();
     }
@@ -77,10 +80,10 @@ export class LexiconComponent implements OnInit {
     createLexicon() {
 
         if (this.newLexicon.name) {
-            this._tagService.saveLexicon(this.newLexicon)
+            this._lexiconService.saveLexicon(this.newLexicon)
                 .subscribe(
                     lexicon => {
-                        this._tagService.getLexicons()
+                        this._lexiconService.getLexicons()
                             .subscribe(
                                 data => {
                                     this.lexicons = data;
@@ -103,18 +106,18 @@ export class LexiconComponent implements OnInit {
     }
 
     doDeleteLexicon() {
-        this._tagService.deleteLexicon(this.lexicon)
+        this._lexiconService.deleteLexicon(this.lexicon)
             .subscribe(
                 () => {
                     this.cancelDelete();
                     this.init();
-                }
-            );
+            }
+        );
     }
 
     addTag() {
         if (this.newTag.name) {
-            this._tagService.addTag(this.lexicon._id, this.newTag)
+            this._tagService.addTag(this.newTag)
                 .subscribe(res =>
                     this.onLexiconSelectChanged(this.lexicon._id)
                 );
@@ -122,15 +125,12 @@ export class LexiconComponent implements OnInit {
     }
 
     deleteTag(tagId: string) {
-        this._tagService.deleteTag(this.lexicon._id, tagId)
-            .subscribe(res =>
-                this.onLexiconSelectChanged(this.lexicon._id)
-            );
+        console.log(`In deleteTag in Lexicon - ${tagId}`);
     }
 
     onLexiconUpdated(lexicon: Lexicon) {
 	    console.log(`In onLexiconUpdated ${lexicon.name}`);		
-        this._tagService.updateLexicon(this.lexicon)
+        this._lexiconService.updateLexicon(this.lexicon)
             .subscribe(res =>
                 console.log(`onLexiconUpdated - response from update - ${JSON.stringify(res)}`)
             );		

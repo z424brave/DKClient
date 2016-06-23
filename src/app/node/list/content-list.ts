@@ -157,11 +157,12 @@ export class ContentList implements OnInit {
     private _getAllTags() {
 
         console.log(`in content-list / getAllTags`);
-        this._tagService.getLexicons().subscribe(
+        this._tagService.getTags().subscribe(
             data => {
 
                 let tags = _.flatMap(_.map(data, 'tags'));
-                this.allValues = tags.map((tag: Tag) => {
+                console.log(`in content-list / getAllTags : ${JSON.stringify(tags)}`);
+                this.allValues = data.map((tag: Tag) => {
                     return new UpdateFromSelectValue(tag._id, tag.name);
                 });
 

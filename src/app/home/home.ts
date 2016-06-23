@@ -19,6 +19,7 @@ import {MainMenu} from '../menu/menu-component';
     console.log(`In home`);
     return authCheck('user', next, previous);
 })
+
 export class Home {
 
     constructor() {

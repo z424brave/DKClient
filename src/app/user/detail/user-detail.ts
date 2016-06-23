@@ -13,6 +13,7 @@ import {UpdateFromSelectValue} from '../../common/model/update-from-select-value
 import {UpdateFromSelect} from '../../common/directives/update-from-select/update-from-select';
 
 @Component({
+    selector: 'user-detail',
     directives: [FORM_DIRECTIVES, UpdateFromSelect],
     providers: [UserService, HttpClient],
     template: require('./user-detail.html'),

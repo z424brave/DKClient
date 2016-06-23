@@ -52,7 +52,7 @@ export class ContentDetail implements OnInit {
     activeTab: ContentTab;
 	editorContent: string;
 	testContent: string = "Hello me";	
-	types: String[] = ['text','html','image'];
+	types: String[] = ['text','html','image','json'];
     node: ContentNode;
 	tags: Array<Tag>;
     uploadedFileName: string = "";
@@ -107,11 +107,11 @@ export class ContentDetail implements OnInit {
     private _getAllTags() {
 
         console.log(`in content-details / _getAllTags`);
-        this._tagService.getLexicons().subscribe(
+        this._tagService.getTags().subscribe(
             data => {
 
                 let tags = _.flatMap(_.map(data, 'tags'));
-                this.allValues = tags.map((tag: Tag) => {
+                this.allValues = data.map((tag: Tag) => {
                     return new UpdateFromSelectValue(tag._id, tag.name);
                 });
 

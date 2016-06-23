@@ -9,6 +9,7 @@ import {Home} from './home/home';
 import {LoginComponent} from './login/login';
 import {UserComponent} from './user/user-component';
 import {LexiconComponent} from './lexicon/lexicon';
+import {TagComponent} from './tag/tag-component';
 import {MediaComponent} from './media/media';
 import {ChannelComponent} from './channel/channel';
 import {ContentList} from './node/list/content-list';
@@ -31,6 +32,7 @@ import {ContentDetail} from './node/detail/content-detail';
     {path: '/login', component: LoginComponent, name: 'Login'},
     {path: '/user/...', component: UserComponent, name: 'User'},
     {path: '/lexicon', component: LexiconComponent, name: 'Lexicon'},
+    {path: '/tag/...', component: TagComponent, name: 'Tag'},
     {path: '/media', component: MediaComponent, name: 'Media'},	
     {path: '/channel/...', component: ChannelComponent, name: 'Channel'},
     {path: '/content', component: ContentList, name: 'Content'},

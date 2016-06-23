@@ -18,6 +18,7 @@
 					<li *ngIf="authCheck('admin')"><a [routerLink]=" ['Channel'] ">Channel</a></li>
 					<li *ngIf="authCheck('admin')"><a [routerLink]=" ['User'] ">User</a></li>
                     <li *ngIf="authCheck('admin')"><a [routerLink]=" ['Lexicon'] ">Lexicon</a></li>
+                    <li *ngIf="authCheck('admin')"><a [routerLink]=" ['Tag'] ">Tag</a></li>
                 </ul>
                 <div class="user-panel">
                     <div class="user-info">{{user.name}}</div>

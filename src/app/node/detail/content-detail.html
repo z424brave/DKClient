@@ -60,7 +60,7 @@
                class="form-control" id="InputVersionMessage2"
                placeholder="Version message" readonly>
     </div>
-    <div class="row" *ngIf="(node.type==='text' || node.type==='html')">
+    <div class="row" *ngIf="( node.type==='text' || node.type==='html' || node.type==='json' )">
         <div class="col-md-8">
             <tabset>
                 <tab *ngFor="let languageTab of languageTabs"
@@ -69,7 +69,7 @@
                      (deselect)="languageTab.active = false"
                      (select)="selectTab(languageTab)"
                      [disabled]="languageTab.disabled">
-                    <inline-editor [(ngModel)]="editorContent" (change)="editorContentChanged($event)" [config]="{uiColor: '#99000',readOnly: !currentVersion}">
+                    <inline-editor [(ngModel)]="editorContent" (change)="editorContentChanged($event)" [config]="{uiColor: '#99000', readOnly: !currentVersion}">
                     </inline-editor>
                 </tab>
 			</tabset>

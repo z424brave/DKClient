@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, Output, AfterViewInit, OnInit, ViewChild, EventEmitter, Renderer} from '@angular/core';
-import {NgControl, ControlValueAccessor} from '@angular/common';
+import {NgControl} from '@angular/common';
 
 declare var CKEDITOR: any;
 

@@ -1,12 +1,12 @@
-<!--<div class="container">
+<div class="container">
 
-    <div class="navbar navbar-default">
+<!--    <div class="navbar navbar-default">
         <div class="navbar-header">
             <a class="navbar-brand" href>Titan Upload</a>
         </div>
-    </div>
+    </div>-->
 
-    <div class="row">-->
+    <div class="row">
 
         <div class="col-md-3" *ngIf="!fileUploaded">
 
@@ -18,14 +18,15 @@
                  [uploader]="uploader"
                  class="well my-drop-zone">
                 Base drop zone
+                <input type="file" ng2FileSelect [uploader]="uploader" />
             </div>
 
-            Single
-            <input type="file" ng2FileSelect [uploader]="uploader" />
+<!--            Single
+            <input type="file" ng2FileSelect [uploader]="uploader" />-->
         </div>
         <div class="col-md-3" *ngIf="(fileUploadedName)">
 
-            <h3>File Uploaded</h3>
+            <h3>File Selected</h3>
 
             {{fileUploadedName}}
 
@@ -35,7 +36,7 @@
             <tree-view [root]="s3Node"></tree-view>
             <label for="targetFileName">Target File Name</label>
             <input type="text" id="targetFileName" class="form-control" value="{{currentFolder + fileUploadedName}}" />
-            <button class="btn btn-default" (click)="saveFileName($event)">Save File</button>
+            <button class="btn btn-success" (click)="saveFileName($event)">Save File</button>
         </div>
         <div class="col-md-9" style="margin-bottom: 40px" *ngIf="(!fileUploadedName)">
 
@@ -106,6 +107,6 @@
 
         </div>
 
-<!--    </div>
+    </div>
 
-</div>-->
+</div>

@@ -48,7 +48,7 @@
 .tag-input .tag {
     width: 100%;
     padding: 0 10px;
-    height: 24px;
+    /*height: 24px;*/
 }
 
 .tag-input .tag:hover {
