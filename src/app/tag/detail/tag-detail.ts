@@ -21,7 +21,7 @@ let _ = require('lodash');
 
 @Component({
     template: require('./tag-detail.html'),
-    styles: [require('./../../lexicon/lexicon.css'), require('../../app.css')],
+    styles: [require('./tag-detail.css'), require('../../app.css')],
     providers: [TagService, PaginationService],
     directives: [UpdateTextfield, MainMenu, CORE_DIRECTIVES, FORM_DIRECTIVES,PaginationControlsCmp],
     pipes: [PaginatePipe, IsoDatePipe]

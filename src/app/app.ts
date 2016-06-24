@@ -8,7 +8,7 @@ import {MainMenu} from './menu/menu-component';
 import {Home} from './home/home';
 import {LoginComponent} from './login/login';
 import {UserComponent} from './user/user-component';
-import {LexiconComponent} from './lexicon/lexicon';
+import {LexiconComponent} from './lexicon/lexicon-component';
 import {TagComponent} from './tag/tag-component';
 import {MediaComponent} from './media/media';
 import {ChannelComponent} from './channel/channel';
@@ -31,7 +31,7 @@ import {ContentDetail} from './node/detail/content-detail';
     {path: '/', component: Home, name: 'Home', useAsDefault: true},
     {path: '/login', component: LoginComponent, name: 'Login'},
     {path: '/user/...', component: UserComponent, name: 'User'},
-    {path: '/lexicon', component: LexiconComponent, name: 'Lexicon'},
+    {path: '/lexicon/...', component: LexiconComponent, name: 'Lexicon'},
     {path: '/tag/...', component: TagComponent, name: 'Tag'},
     {path: '/media', component: MediaComponent, name: 'Media'},	
     {path: '/channel/...', component: ChannelComponent, name: 'Channel'},

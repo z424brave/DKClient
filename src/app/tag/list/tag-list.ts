@@ -18,7 +18,7 @@ let _ = require('lodash');
 
 @Component({
     template: require('./tag-list.html'),
-    styles: [require('./../../lexicon/lexicon.css'), require('../../app.css')],
+    styles: [require('./tag-list.css'), require('../../app.css')],
     providers: [TagService, PaginationService],
     directives: [UpdateTextfield, MainMenu, CORE_DIRECTIVES, FORM_DIRECTIVES,PaginationControlsCmp],
     pipes: [PaginatePipe, IsoDatePipe]
@@ -54,13 +54,14 @@ export class TagList implements OnInit {
         this.newTag = new Tag();
     }
 
-    addTag() {
-        console.log(`In Tag - addTag`);
-            this._tagService.addTag(this.newTag)
-                .subscribe(() => {
-                    this._router.navigate(['TagDetail', {id: undefined}]);
-                }
-            );
+    createTag() {
+        console.log(`In Tag - createTag`);
+        this._router.navigate(['TagDetail', {id: undefined}]);
+    }
+
+    onSelectTag(tag) {
+        console.log(`In Tag - onSelectTag`);
+        this._router.navigate(['TagDetail', {id: tag._id}]);
     }
 
     deleteTag(tagId: string) {
