@@ -8,6 +8,7 @@ import {TreeView} from "../tree-view/tree-view";
 import {TreeNodeService} from "../../service/tree-node-service";
 import {Subscription} from 'rxjs/Subscription';
 import {S3Service} from "../../service/s3Service";
+
 const UPLOADURL: string = API_ENDPOINT.concat('/nodes/api/');
 
 @Component({
@@ -20,6 +21,7 @@ const UPLOADURL: string = API_ENDPOINT.concat('/nodes/api/');
 })
 
 export class FileUpload extends FileUploader {
+
     @Output() onUploaded = new EventEmitter<String>();
     @Output() onFileNameSaved = new EventEmitter<String>();
     s3Node: TreeNode = null;

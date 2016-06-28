@@ -8,6 +8,7 @@ export class Content extends BaseEntity {
     versionMessage: string;
     translated: boolean;
     sentForTranslation: Date;
+    published: Date;
 
     constructor() {
         super();

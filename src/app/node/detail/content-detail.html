@@ -60,7 +60,7 @@
                class="form-control" id="InputVersionMessage2"
                placeholder="Version message" readonly>
     </div>
-    <div class="row" *ngIf="( node.type==='text' || node.type==='html' || node.type==='json' )">
+    <div class="row" *ngIf="( node.type==='text' || node.type==='html' )">
         <div class="col-md-8">
             <tabset>
                 <tab *ngFor="let languageTab of languageTabs"
@@ -74,6 +74,32 @@
                 </tab>
 			</tabset>
 		</div>
+        <div *ngIf="!isNewNode" class="col-md-4">
+            <h3>History</h3>
+            <ul class="fa-ul">
+                <li *ngFor="let content of node.content | versionSort" class="content-version">
+                    <span (click)="changeVersion(content)">
+                        <i class="fa-li fa fa-file-code-o"></i>
+                        {{content.versionNo}} - {{content.versionMessage}}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row" *ngIf="( node.type==='json' )">
+        <div class="col-md-8">
+            <tabset>
+                <tab *ngFor="let languageTab of languageTabs"
+                     [heading]="languageTab.title"
+                     [active]="languageTab.active"
+                     (deselect)="languageTab.active = false"
+                     (select)="selectTab(languageTab)"
+                     [disabled]="languageTab.disabled">
+                    <textarea [(ngModel)]="editorContent" (change)="editorContentChanged($event)" class="json-textarea" >
+                    </textarea>
+                </tab>
+            </tabset>
+        </div>
         <div *ngIf="!isNewNode" class="col-md-4">
             <h3>History</h3>
             <ul class="fa-ul">
@@ -120,7 +146,7 @@
         <button *ngIf="currentVersion" type="submit" class="btn btn-success">{{saveAction}}</button>
         <button *ngIf="(( currentVersion && node.content[0]) && (!node.content[0].translated && !node.content[0].sentForTranslation))"
                 class="btn btn-default" (click)="translate($event)">Translate</button>
-        <button *ngIf="currentVersion" class="btn btn-default" (click)="publish($event)">Publish</button>
+        <button *ngIf="( currentVersion  )" class="btn btn-default" (click)="publish($event)">Publish</button>
         <button class="btn btn-default" (click)="cancel($event)">Cancel</button>
     </div>
     <content-publish></content-publish>

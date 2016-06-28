@@ -161,6 +161,31 @@ export class ContentService {
         });
     }
 
+    publishNode(node: ContentNode, targetFileName: string) {
+        return Observable.create(observer => {
+            console.log(`contentService / publishNode : ${JSON.stringify(node)}`);
+            this._httpClient.put(this.baseUrl.concat('publish/').concat(node._id).concat('?fileName=').concat(targetFileName), JSON.stringify(node))
+                .map((responseData) => {
+                    return responseData.json();
+                })
+                .subscribe(
+                    data => {
+                        observer.next(data);
+                        this._notificationService.publish(
+                            new Notification(
+                                'Node updated successfully',
+                                Notification.types.SUCCESS)
+                        );
+                    },
+                    err => this._notificationService.handleError(
+                        new ApplicationError(
+                            'Error updating node',
+                            err)
+                    ),
+                    () => observer.complete()
+                );
+        });
+    }
 
     addContent(nodeId: string, content: Content){
         return Observable.create(observer => {

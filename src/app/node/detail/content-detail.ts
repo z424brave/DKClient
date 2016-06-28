@@ -457,6 +457,7 @@ export class ContentDetail implements OnInit {
 
         console.log(`Publish - ${JSON.stringify($event)}`);
         $event.preventDefault();
+        this.contentPublish.node = this.node;
         this.contentPublish.showPublish(`Lets publish this - ${this.node.name}`);
 
     }

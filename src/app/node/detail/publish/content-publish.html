@@ -12,9 +12,11 @@
                         <div class="form-group">
                             <label for="InputChannel">Channel</label>
                             <select id="InputChannel" class="form-control"
-                                required
+                                required [ngModel]="selectedChannel"
+                                    (ngModelChange)="onSelectedChannelChanged($event)"
                                 placeholder="Channel">
-                                <option *ngFor="let channel of channels" [value]="channel">{{channel}}</option>
+                                <option *ngFor="let channel of channels"
+                                        [value]="channel">{{channel}}</option>
                             </select>
                         </div>
                     </div>
@@ -34,10 +36,15 @@
                             </div>
                          </div>
                         <div class="row">
-                            <div class="col-md-12">
-                            <label for="SomeText" style="margin-top: 50px;">Enter Text</label>
-                            <input type="text" id="SomeText" class="form-control">
-                                </div>
+                            <div class="col-md-12" *ngIf="selectedChannel==='Twitter'">
+                                <label for="SomeText" style="margin-top: 50px;">Enter Text</label>
+                                <input type="text" id="SomeText" class="form-control">
+                            </div>
+                            <div class="col-md-12" *ngIf="selectedChannel==='Launcher'">
+                                <label for="SomeFile" style="margin-top: 50px;">Select Target File Name</label>
+                                <input type="text" id="SomeFile" class="form-control" required
+                                       [(ngModel)]="publishFileName">
+                            </div>
                         </div>
 
                     </div>

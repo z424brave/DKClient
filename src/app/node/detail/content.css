@@ -18,3 +18,8 @@ content-editor {
     height: 200px;
     margin-left: 50px;
 }
+
+.json-textarea {
+    width: 700px;
+    height: 300px;
+}
