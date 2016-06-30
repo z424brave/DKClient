@@ -26,13 +26,14 @@ import {TreeNode} from "../../common/model/tree-node";
 import {TreeView} from "../../common/directives/tree-view/tree-view";
 import {TreeNodeService} from "../../common/service/tree-node-service";
 import {ContentPublish} from "./publish/content-publish";
+import {ContentEditjson} from "./edit/content-editjson";
 
 let _ = require('lodash');
 
 @Component({
     directives: [InlineEditor, TAB_DIRECTIVES, CORE_DIRECTIVES,
         FORM_DIRECTIVES, MainMenu, UpdateFromSelect,
-        FileUpload, ImageBox, TreeView, ContentPublish],
+        FileUpload, ImageBox, TreeView, ContentPublish, ContentEditjson],
     providers: [ContentService, TagService, LanguageService, TreeNodeService],
     template: require('./content-detail.html'),
 	pipes: [VersionSort],
@@ -67,6 +68,9 @@ export class ContentDetail implements OnInit {
     @ViewChild(ContentPublish)
     private contentPublish: ContentPublish;
 
+    @ViewChild(ContentEditjson)
+    private contentEditjson: ContentEditjson;
+    
     constructor(private _contentService: ContentService,
                 private _tagService: TagService,
                 private _languageService: LanguageService,
@@ -461,5 +465,13 @@ export class ContentDetail implements OnInit {
         this.contentPublish.showPublish(`Lets publish this - ${this.node.name}`);
 
     }
+    
+    editJson($event) {
 
+        console.log(`Edit - ${JSON.stringify($event)}`);
+        $event.preventDefault();
+        this.contentEditjson.node = this.node;
+        this.contentEditjson.showEditjson();
+
+    }
 }

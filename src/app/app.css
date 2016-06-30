@@ -31,6 +31,10 @@ notification-center {
     float: right;
 }
 
+.form-buttons-left {
+    margin-top: 20px;
+    float: left;
+}
 
 .delete-cell {
     cursor: default;

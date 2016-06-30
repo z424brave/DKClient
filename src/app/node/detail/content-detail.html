@@ -149,5 +149,9 @@
         <button *ngIf="( currentVersion  )" class="btn btn-default" (click)="publish($event)">Publish</button>
         <button class="btn btn-default" (click)="cancel($event)">Cancel</button>
     </div>
+    <div class="form-buttons-left">
+        <button *ngIf="( currentVersion && node.type==='json')" (click)="editJson($event)" class="btn btn-success">Edit</button>
+    </div>
     <content-publish></content-publish>
+    <content-editjson></content-editjson>
 </form>
