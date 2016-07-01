@@ -17,7 +17,7 @@ import {Tag} from "../../common/model/lexicon/tag";
 let _ = require('lodash');
 
 @Component({
-    selector: "node-list",
+    selector: 'content-list',
     directives: [MainMenu, UpdateFromSelect, FORM_DIRECTIVES],
     pipes: [IsoDatePipe],
     template: require('./content-list.html'),

@@ -13,7 +13,7 @@ import {ContentDetail} from './detail/content-detail';
 })
 
 @RouteConfig([
-    {path: '/', name: 'Content', component: ContentList, useAsDefault: true},
+    {path: '/', name: 'ContentList', component: ContentList, useAsDefault: true},
     {path: '/:id', name: 'ContentDetail', component: ContentDetail}
 ])
 

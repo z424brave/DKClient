@@ -64,16 +64,16 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let node of nodes">
-        <td (click)="onSelect(node)">{{node.created | isoDate: "d mmmm yyyy" }}</td>
-        <td (click)="onSelect(node)">{{node.name}}</td>
-        <td (click)="onSelect(node)">{{node.user.name}}</td>
-        <td (click)="onSelect(node)">{{node.type}}</td>
+    <tr *ngFor="let application of applications">
+        <td (click)="onSelect(application)">{{application.created | isoDate: "d mmmm yyyy" }}</td>
+        <td (click)="onSelect(application)">{{application.name}}</td>
+        <td (click)="onSelect(application)">{{application.user.name}}</td>
+        <td (click)="onSelect(application)">{{application.type}}</td>
         <td class="delete-cell">
-            <i *ngIf="(node.user._id === currentUser._id || currentUser.roles.indexOf('admin') >= -1) && node.status === 'active'"
-               (click)="deleteNode($event, node._id)" class="fa fa-minus-square" title="Delete Node"></i>
-            <i *ngIf="(node.user._id === currentUser._id || currentUser.roles.indexOf('admin') >= -1) && node.status === 'deleted'"
-               (click)="restoreNode($event, node)" class="fa fa-plus-square" title="Restore Node"></i>			   
+            <i *ngIf="(application.user._id === currentUser._id || currentUser.roles.indexOf('admin') >= -1) && application.status === 'active'"
+               (click)="deleteNode($event, application._id)" class="fa fa-minus-square" title="Delete Application"></i>
+            <i *ngIf="(application.user._id === currentUser._id || currentUser.roles.indexOf('admin') >= -1) && application.status === 'deleted'"
+               (click)="restoreNode($event, application)" class="fa fa-plus-square" title="Restore Application"></i>
         </td>
     </tr>
     </tbody>
