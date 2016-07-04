@@ -1,7 +1,7 @@
 /**
  * Created by Damian.Kelly on 01/07/2016.
  */
-import {OnInit, Component, ViewChild} from "@angular/core";
+import {OnInit, Component, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked } from "@angular/core";
 import {Router, RouteParams, CanActivate, ComponentInstruction} from "@angular/router-deprecated";
 import {CORE_DIRECTIVES, FORM_DIRECTIVES} from "@angular/common";
 import {TAB_DIRECTIVES} from "ng2-bootstrap/ng2-bootstrap";
@@ -29,6 +29,9 @@ import {ContentPublish} from "../../node/detail/publish/content-publish";
 import {ContentEditjson} from "../../node/detail/edit/content-editjson";
 import {Application} from "../../common/model/node/application";
 import {ApplicationService} from "../../common/service/application-service";
+import {ContentNode} from "../../common/model/node/content-node";
+import {ContentTab} from "../../node/tab/content-tab";
+import {NodeType} from "../../common/model/node/node-type";
 
 let _ = require('lodash');
 
@@ -46,7 +49,8 @@ let _ = require('lodash');
     return authCheck('user', next, previous);
 })
 
-export class ContentDetail implements OnInit {
+export class ContentDetail implements OnInit, AfterContentChecked, AfterContentInit,
+    AfterViewInit, AfterViewChecked {
 
     urlPrefix: string = EXTERNAL_URL_PREFIX;
     content: Content;
@@ -61,7 +65,10 @@ export class ContentDetail implements OnInit {
     isNewContentNode: boolean;
     saveAction: string;
     s3Node: TreeNode = null;
-
+    contentTypes: String[] = ['john','paul']
+    textNodes: ContentNode[];
+    imageNodes: ContentNode[];
+    private languageTabs: Array<NodeType> = [];
 
     private submitted: boolean;
     private supportedLanguages = [];
@@ -71,6 +78,10 @@ export class ContentDetail implements OnInit {
                 private _routeParams: RouteParams,
                 private _router: Router) {
 
+        this.contentNode = new Application();
+        console.log(`constructor - contentNode : ${JSON.stringify(this.contentNode)}`);
+        this.languageTabs.push(new NodeType('text',true, false));
+        this.languageTabs.push(new NodeType('image',false, true));
     }
 
     private _initNode() {
@@ -106,7 +117,16 @@ export class ContentDetail implements OnInit {
                 data => {
                     this.contentNode = data;
                     console.log(`Node : ${JSON.stringify(this.contentNode)}`);
+                    console.log(`Node : ${this.contentNode.applicationType.name}`);
                     this.currentVersion = false;
+                    this.textNodes = this.contentNode.nodes.filter((cNode: ContentNode ) => {
+                        return cNode.type === 'text';
+                    });
+                    this.imageNodes = this.contentNode.nodes.filter((cNode: ContentNode ) => {
+                        return cNode.type === 'image';
+                    });
+                    console.log(`content-detail : ${this.contentNode.name} - ${this.textNodes.length} text nodes` );
+                    console.log(`content-detail : ${this.contentNode.name} - ${this.imageNodes.length} image nodes` );
                 }
             );
 
@@ -119,9 +139,34 @@ export class ContentDetail implements OnInit {
         this.content = new Content();
         this.content.media = [];
         let id = this._routeParams.get('id');
-        console.log(`In ngOnInit - ${this._routeParams.get('versionNo')}`);
+        console.log(`content-detail - In ngOnInit - ${this._routeParams.get('versionNo')}`);
         this.s3Node = new TreeNode('root','/', '');
         this._initNode();
+
+    }
+
+    ngAfterViewInit() {
+
+        console.log(`In content-details / ngAfterViewInit`);
+
+    }
+
+    ngAfterViewChecked() {
+
+        console.log(`In content-details / ngAfterViewChecked`);
+
+    }
+
+    ngAfterContentInit() {
+
+        console.log(`In content-details / ngAfterContentInit`);
+
+    }
+
+    ngAfterContentChecked() {
+
+        console.log(`In content-details / ngAfterContentChecked`);
+        console.log(`ngAfterContentChecked - contentNode : ${JSON.stringify(this.contentNode)}`);
 
     }
 
@@ -205,11 +250,11 @@ export class ContentDetail implements OnInit {
 
     onTypeChanged($event) {
         console.log(`onTypeChanged ${$event}`);
-        this.contentNode.type = _.find(this.types, (t) => {
+        this.contentNode.applicationType = _.find(this.types, (t) => {
             console.log(`onTypeChanged : ${t}`);
             return t === $event;
         });
-        console.log(`onTypeChanged ${this.contentNode.type}`);
+        console.log(`onTypeChanged ${this.contentNode.applicationType}`);
     }
 
     onVersionMessageChanged($event) {
@@ -230,6 +275,13 @@ export class ContentDetail implements OnInit {
 
         console.log(`Translate - ${JSON.stringify($event)}`);
         $event.preventDefault();
+
+    }
+
+    selectTab(tab) {
+
+        console.log(`In selectTab - ${tab.title} - ${tab.active}`);
+        if (!tab.active) {tab.active = true;}
 
     }
 

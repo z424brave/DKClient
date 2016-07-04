@@ -76,8 +76,8 @@ export class ContentList implements OnInit {
 
     public newContent() {
 
-/*        console.log("In newContent");
-        this._router.navigate(['ContentDetail', {id: "", versionNo: 1}]);*/
+        console.log("In newContent");
+        this._router.navigate(['ContentDetail', {id: "", versionNo: 1}]);
 
     }
 
@@ -85,11 +85,11 @@ export class ContentList implements OnInit {
 
 /*        this.searchNode.tags = this.allValues.filter((value) => {
 
-            return value.selected;
+         return value.selected;
 
-        }).map((selectedValue) => {
-            return selectedValue.key;
-        });*/
+         }).map((selectedValue) => {
+         return selectedValue.key;
+         });*/
 
         console.log(`Search params are : ${JSON.stringify(this.searchNode)}`);
         this._applicationService.listApplications(this.searchNode)

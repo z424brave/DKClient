@@ -9,7 +9,6 @@ export class ApplicationType extends BaseEntity {
     name: string;
     user: User;
     tags: string[] = [];
-    type: ApplicationType;
     status: string;
 
     constructor() {

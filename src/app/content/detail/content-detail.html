@@ -36,11 +36,45 @@
             </div>
         </div>
     </div>
+    <div class="row">
     <div class="form-buttons">
         <button type="submit" class="btn btn-success">{{saveAction}}</button>
         <button class="btn btn-default" (click)="translate($event)">Translate</button>
         <button class="btn btn-default" (click)="publish($event)">Publish</button>
         <button class="btn btn-default" (click)="cancel($event)">Cancel</button>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <tabset>
+                <tab *ngFor="let languageTab of languageTabs"
+                    [heading]="languageTab.title"
+                    [active]="languageTab.active"
+                    (deselect)="languageTab.active = false"
+                    (select)="selectTab(languageTab)"
+                    [disabled]="languageTab.disabled">
+                    <div class="row" *ngIf="languageTab.title==='text'">
+                        <div class="col-md-8" *ngFor="let textNode of textNodes">
+                            <div class="form-group">
+                                <label>{{textNode.content[0].media[0].content}}</label>
+                                <input type="text" [ngModel]="textNode.name"
+                                       class="form-control" value="textNode.name" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="!(languageTab.title==='text')">
+                        <div class="col-md-8" *ngFor="let imageNode of imageNodes">
+                            <div class="form-group">
+                                <label>{{imageNode.name}}</label>
+                                <textarea class="form-control">
+                                    {{imageNode.content[0].media[0].content}}
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
     </div>
 
     <content-publish></content-publish>

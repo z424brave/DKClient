@@ -11,13 +11,15 @@ export class Application extends BaseEntity {
     name: string;
     user: User;
     tags: string[] = [];
-    type: ApplicationType;
+    applicationType: ApplicationType;
     status: string;
     publishable: boolean;
     nodes: ContentNode[];
 
     constructor() {
         super();
+        this.applicationType = new ApplicationType();
+        this.applicationType.name = 'defaultAppType';
     }
 
 }
