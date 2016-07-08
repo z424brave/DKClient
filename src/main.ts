@@ -1,6 +1,6 @@
 import {provide} from '@angular/core';
 import {bootstrap} from '@angular/platform-browser-dynamic';
-import {ELEMENT_PROBE_PROVIDERS} from '@angular/platform-browser';
+//import {ELEMENT_PROBE_PROVIDERS} from '@angular/platform-browser';
 import {ROUTER_PROVIDERS} from '@angular/router-deprecated';
 import {Http, HTTP_PROVIDERS} from '@angular/http';
 import {FORM_PROVIDERS} from '@angular/common';
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function main() {
         AuthService,
         HttpClient,
         NotificationService,
-        ...('production' === process.env.ENV ? [] : ELEMENT_PROBE_PROVIDERS),
+  //      ...('production' === process.env.ENV ? [] : ELEMENT_PROBE_PROVIDERS),
         ...HTTP_PROVIDERS,
         ROUTER_PROVIDERS,
         ...FORM_PROVIDERS,

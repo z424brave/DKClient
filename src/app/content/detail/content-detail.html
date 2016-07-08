@@ -53,23 +53,28 @@
                     (deselect)="languageTab.active = false"
                     (select)="selectTab(languageTab)"
                     [disabled]="languageTab.disabled">
-                    <div class="row" *ngIf="languageTab.title==='text'">
+                    <div class="row" *ngIf="textNodes.length > 0 && languageTab.title==='text'">
                         <div class="col-md-8" *ngFor="let textNode of textNodes">
                             <div class="form-group">
-                                <label>{{textNode.content[0].media[0].content}}</label>
-                                <input type="text" [ngModel]="textNode.name"
-                                       class="form-control" value="textNode.name" />
+                                <label>{{textNode.name}}</label>
+                                <input type="text" [ngModel]="textNode.content[0].media[0].content"
+                                       class="form-control" value="textNode.content[0].media[0].content" />
                             </div>
                         </div>
                     </div>
-                    <div class="row" *ngIf="!(languageTab.title==='text')">
+                    <div class="row" *ngIf="imageNodes.length > 0 && languageTab.title==='image'">
                         <div class="col-md-8" *ngFor="let imageNode of imageNodes">
-                            <div class="form-group">
-                                <label>{{imageNode.name}}</label>
-                                <textarea class="form-control">
-                                    {{imageNode.content[0].media[0].content}}
-                                </textarea>
+                            <div *ngIf="imageNode.content[0].media[0].content">
+                                <image-box [imageFileName]="imageNode.content[0].media[0].content"></image-box>
                             </div>
+                            <div *ngIf="!imageNode.content[0].media[0].content" class="row">
+                                <file-upload (onUploaded)="onUploaded($event)" (onFileNameSaved)="onFileNameSaved($event)"></file-upload>
+                            </div>
+<!--                            <div class="form-group">
+                                <label>{{imageNode.name}}</label>
+                                <input type="text" [ngModel]="imageNode.content[0].media[0].content"
+                                       class="form-control" value="imageNode.content[0].media[0].content" />
+                            </div>-->
                         </div>
                     </div>
                 </tab>

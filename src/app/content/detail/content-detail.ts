@@ -80,8 +80,12 @@ export class ContentDetail implements OnInit, AfterContentChecked, AfterContentI
 
         this.contentNode = new Application();
         console.log(`constructor - contentNode : ${JSON.stringify(this.contentNode)}`);
-        this.languageTabs.push(new NodeType('text',true, false));
-        this.languageTabs.push(new NodeType('image',false, true));
+//        this.languageTabs.push(new NodeType('text',true, false));
+//        this.languageTabs.push(new NodeType('image',false, true));
+        this.textNodes = [];
+        this.imageNodes = [];
+        console.log(`content nodes : ${this.textNodes.length} / ${this.imageNodes.length}`);
+
     }
 
     private _initNode() {
@@ -122,9 +126,16 @@ export class ContentDetail implements OnInit, AfterContentChecked, AfterContentI
                     this.textNodes = this.contentNode.nodes.filter((cNode: ContentNode ) => {
                         return cNode.type === 'text';
                     });
+                    if (this.textNodes.length > 0) {
+                        this.languageTabs.push(new NodeType('text',true, false));
+                    }
                     this.imageNodes = this.contentNode.nodes.filter((cNode: ContentNode ) => {
                         return cNode.type === 'image';
                     });
+                    if (this.imageNodes.length > 0) {
+                        this.languageTabs.push(new NodeType('image',this.textNodes.length > 0 ? false : true, true));
+                    }
+
                     console.log(`content-detail : ${this.contentNode.name} - ${this.textNodes.length} text nodes` );
                     console.log(`content-detail : ${this.contentNode.name} - ${this.imageNodes.length} image nodes` );
                 }
